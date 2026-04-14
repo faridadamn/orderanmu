@@ -7,20 +7,15 @@ const fmt = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
 
 // Sample data
 let orders = [
-  {id:'ORD-100001',queue:1,nama:'Budi Santoso',hp:'08123456789',type:'dine',note:'',items:[{name:'Nasi Goreng',emoji:'🍳',price:18000,qty:2},{name:'Es Teh',emoji:'🧊',price:5000,qty:2}],sub:46000,tax:5060,total:51060,status:'pending',time:'08:24',date:'14/04/2025'},
-  {id:'ORD-100002',queue:2,nama:'Siti Rahayu',hp:'08234567890',type:'takeaway',note:'extra pedas',items:[{name:'Ayam Bakar',emoji:'🍗',price:25000,qty:1},{name:'Jus Jeruk',emoji:'🍊',price:10000,qty:1}],sub:35000,tax:3850,total:38850,status:'processing',time:'08:31',date:'14/04/2025'},
-  {id:'ORD-100003',queue:3,nama:'Ahmad Rizky',hp:'08345678901',type:'dine',note:'',items:[{name:'Mie Ayam',emoji:'🍜',price:15000,qty:1}],sub:15000,tax:1650,total:16650,status:'done',time:'08:15',date:'14/04/2025'},
+  {id:'ORD-100001',queue:1,nama:'Romeo',hp:'081234567890',type:'takeaway',note:'pedes bwang',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1}],sub:38000,tax:4180,total:42180,status:'pending',time:'08:24',date:'14/04/2025'},
+  {id:'ORD-100002',queue:2,nama:'Yayat',hp:'6281212686654',type:'takeaway',note:'Bawang semua',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1},{name:'Es Teh',emoji:'🧊',price:5000,qty:2}],sub:48000,tax:5280,total:53280,status:'pending',time:'08:31',date:'14/04/2025'},
+  {id:'ORD-100003',queue:3,nama:'Ahmad Rizky',hp:'08345678901',type:'dine',note:'',items:[{name:'Mie Ayam',emoji:'🍜',price:15000,qty:1}],sub:15000,tax:1650,total:16650,status:'pending',time:'08:15',date:'14/04/2025'},
 ];
 
 let menuItems = [
-  {id:'1',name:'Nasi Goreng Spesial',price:18000,emoji:'🍳',cat:'makanan',desc:'Nasi goreng bumbu rahasia',stock:22,sold:134},
-  {id:'2',name:'Mie Ayam Bakso',price:15000,emoji:'🍜',cat:'makanan',desc:'Mie kenyal dengan bakso',stock:10,sold:89},
-  {id:'3',name:'Ayam Bakar Madu',price:25000,emoji:'🍗',cat:'makanan',desc:'Ayam bakar dengan madu',stock:3,sold:67},
-  {id:'4',name:'Soto Ayam',price:14000,emoji:'🥣',cat:'makanan',desc:'Kuah bening segar',stock:8,sold:45},
-  {id:'5',name:'Es Teh Manis',price:5000,emoji:'🧊',cat:'minuman',desc:'Teh segar dengan es',stock:50,sold:200},
-  {id:'6',name:'Jus Jeruk Segar',price:10000,emoji:'🍊',cat:'minuman',desc:'Jeruk peras segar',stock:0,sold:78},
-  {id:'7',name:'Es Cincau Hijau',price:8000,emoji:'🍵',cat:'minuman',desc:'Cincau alami',stock:18,sold:34},
-  {id:'8',name:'Kerupuk Udang',price:3000,emoji:'🥨',cat:'snack',desc:'Kerupuk renyah',stock:99,sold:156},
+  {id:'1',name:'Nasi Padang',price:15000,emoji:'🍚',cat:'makanan',desc:'Nasi dengan lauk padang',stock:22,sold:134},
+  {id:'2',name:'Kuli Jawa',price:8000,emoji:'🥤',cat:'minuman',desc:'Minuman segar',stock:10,sold:89},
+  {id:'3',name:'Es Teh',price:5000,emoji:'🧊',cat:'minuman',desc:'Teh manis dingin',stock:50,sold:200},
 ];
 
 let currentOrderFilter = 'semua';
@@ -122,59 +117,129 @@ function filterOrders(f, btn) {
 function renderOrders() {
   let list = orders;
   if (currentOrderFilter !== 'semua') list = orders.filter(o => o.status === currentOrderFilter);
-  document.getElementById('order-list').innerHTML = list.length ? list.map(o => `
-    <div class="order-card" id="oc-${o.id}">
-      <div class="order-num">${String(o.queue).padStart(2,'0')}</div>
-      <div class="order-info">
-        <div class="order-top">
-          <span class="order-name">${escapeHtml(o.nama)}</span>
-          <span class="order-id">${o.id}</span>
-          <span class="order-type-badge">${o.type==='dine'?'Makan di tempat':'Bawa pulang'}</span>
-        </div>
-        <div class="order-items">${o.items.map(i=>`${i.emoji} ${i.name} ×${i.qty}`).join(' · ')}${o.note?' · 📝 '+escapeHtml(o.note):''}</div>
-        <div class="order-bottom">
-          <div>
-            <span class="order-total">${fmt(o.total)}</span>
-            <span class="order-hp"> · ${o.hp}</span>
+  
+  if (!list.length) {
+    document.getElementById('order-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--c-muted);font-size:14px">Tidak ada pesanan</div>';
+    return;
+  }
+  
+  let html = '';
+  for (let i = 0; i < list.length; i++) {
+    const o = list[i];
+    html += `
+      <div class="order-card" data-order-id="${o.id}" data-order-status="${o.status}">
+        <div class="order-num">${String(o.queue).padStart(2,'0')}</div>
+        <div class="order-info">
+          <div class="order-top">
+            <span class="order-name">${escapeHtml(o.nama)}</span>
+            <span class="order-id">${o.id}</span>
+            <span class="order-type-badge">${o.type==='dine'?'Makan di tempat':'Bawa pulang'}</span>
           </div>
-          <span class="order-status ${o.status==='done'?'status-done':o.status==='processing'?'status-processing':'status-pending'}">
-            ${o.status==='pending'?'Menunggu':o.status==='processing'?'Diproses':'Selesai'}
-          </span>
+          <div class="order-items">${o.items.map(i=>`${i.emoji} ${i.name} ×${i.qty}`).join(' · ')}${o.note?' · 📝 '+escapeHtml(o.note):''}</div>
+          <div class="order-bottom">
+            <div>
+              <span class="order-total">${fmt(o.total)}</span>
+              <span class="order-hp"> · ${o.hp}</span>
+            </div>
+            <span class="order-status ${o.status==='done'?'status-done':o.status==='processing'?'status-processing':'status-pending'}">
+              ${o.status==='pending'?'Menunggu':o.status==='processing'?'Diproses':'Selesai'}
+            </span>
+          </div>
+        </div>
+        <div class="order-actions" id="actions-${o.id}">
+          ${o.status==='pending' ? `<button class="btn-process" data-id="${o.id}" data-action="process">✅ Proses</button><button class="btn-cancel-order" data-id="${o.id}" data-action="cancel">✕ Batalkan</button>` : ''}
+          ${o.status==='processing' ? `<button class="btn-done" data-id="${o.id}" data-action="done">✓ Selesai</button>` : ''}
+          ${o.status==='done' ? `<button class="btn-process" style="background:var(--c-cream);color:var(--c-text)" data-id="${o.id}" data-action="invoice">📄 Invoice</button>` : ''}
         </div>
       </div>
-      <div class="order-actions">
-        ${o.status==='pending'?`<button class="btn-process" onclick="processOrder('${o.id}')">✅ Proses</button><button class="btn-cancel-order" onclick="cancelOrder('${o.id}')">✕ Batalkan</button>`:''}
-        ${o.status==='processing'?`<button class="btn-done" onclick="doneOrder('${o.id}')">✓ Selesai</button>`:''}
-        ${o.status==='done'?`<button class="btn-process" style="background:var(--c-cream);color:var(--c-text)" onclick="showInvoice('${o.id}')">📄 Invoice</button>`:''}
-      </div>
-    </div>`).join('') : '<div style="text-align:center;padding:40px;color:var(--c-muted);font-size:14px">Tidak ada pesanan</div>';
+    `;
+  }
+  
+  document.getElementById('order-list').innerHTML = html;
+  
+  // Attach event listeners ke tombol-tombol yang baru dibuat
+  attachOrderButtonListeners();
 }
 
-// FIXED: Proses pesanan dari pending ke processing
-function processOrder(id) {
-  const order = orders.find(x => x.id === id);
-  if (order && order.status === 'pending') {
-    order.status = 'processing';
-    renderOrders();
-    updateOrderBadge();
-    renderDashboard();
-    showToast(`✅ Pesanan #${order.queue} (${order.nama}) sedang diproses`);
-    
-    // Simpan ke localStorage/backend
-    saveToLocalStorage();
-    syncToBackend('updateOrder', { id, status: 'processing' });
+// ATTACH EVENT LISTENERS ke tombol dinamis
+function attachOrderButtonListeners() {
+  // Tombol Proses (pending -> processing)
+  document.querySelectorAll('.btn-process').forEach(btn => {
+    btn.removeEventListener('click', handleProcessClick);
+    btn.addEventListener('click', handleProcessClick);
+  });
+  
+  // Tombol Selesai (processing -> done)
+  document.querySelectorAll('.btn-done').forEach(btn => {
+    btn.removeEventListener('click', handleDoneClick);
+    btn.addEventListener('click', handleDoneClick);
+  });
+  
+  // Tombol Batalkan
+  document.querySelectorAll('.btn-cancel-order').forEach(btn => {
+    btn.removeEventListener('click', handleCancelClick);
+    btn.addEventListener('click', handleCancelClick);
+  });
+}
+
+// Handler untuk tombol Proses
+function handleProcessClick(e) {
+  e.stopPropagation();
+  const btn = e.currentTarget;
+  const orderId = btn.getAttribute('data-id');
+  if (orderId) {
+    processOrder(orderId);
   }
 }
 
-// FIXED: Selesaikan pesanan dari processing ke done
-async function doneOrder(id) {
-  const order = orders.find(x => x.id === id);
-  if (order && order.status === 'processing') {
-    order.status = 'done';
+// Handler untuk tombol Selesai
+function handleDoneClick(e) {
+  e.stopPropagation();
+  const btn = e.currentTarget;
+  const orderId = btn.getAttribute('data-id');
+  if (orderId) {
+    doneOrder(orderId);
+  }
+}
+
+// Handler untuk tombol Batalkan
+function handleCancelClick(e) {
+  e.stopPropagation();
+  const btn = e.currentTarget;
+  const orderId = btn.getAttribute('data-id');
+  if (orderId) {
+    cancelOrder(orderId);
+  }
+}
+
+// ====== ORDER ACTIONS ======
+function processOrder(orderId) {
+  console.log('Processing order:', orderId);
+  const orderIndex = orders.findIndex(x => x.id === orderId);
+  
+  if (orderIndex !== -1 && orders[orderIndex].status === 'pending') {
+    orders[orderIndex].status = 'processing';
     renderOrders();
     updateOrderBadge();
     renderDashboard();
-    showToast(`🎉 Pesanan #${order.queue} (${order.nama}) selesai!`);
+    showToast(`✅ Pesanan #${orders[orderIndex].queue} (${orders[orderIndex].nama}) sedang diproses`);
+    
+    // Simpan ke localStorage
+    saveToLocalStorage();
+    syncToBackend('updateOrder', { id: orderId, status: 'processing' });
+  } else {
+    console.warn('Order not found or not in pending status:', orderId);
+    showToast('⚠️ Pesanan tidak ditemukan atau sudah diproses');
+  }
+}
+
+function doneOrder(orderId) {
+  console.log('Completing order:', orderId);
+  const orderIndex = orders.findIndex(x => x.id === orderId);
+  
+  if (orderIndex !== -1 && orders[orderIndex].status === 'processing') {
+    const order = orders[orderIndex];
+    order.status = 'done';
     
     // Kurangi stok untuk item yang dipesan
     order.items.forEach(item => {
@@ -184,82 +249,119 @@ async function doneOrder(id) {
         menu.sold = (menu.sold || 0) + item.qty;
       }
     });
+    
+    renderOrders();
+    updateOrderBadge();
+    renderDashboard();
     renderStock();
+    showToast(`🎉 Pesanan #${order.queue} (${order.nama}) selesai!`);
     
-    // Simpan ke localStorage/backend
+    // Simpan ke localStorage
     saveToLocalStorage();
-    await syncToBackend('completeOrder', { id, status: 'done' });
+    syncToBackend('completeOrder', { id: orderId, status: 'done' });
     
-    // Kirim invoice ke WhatsApp (simulasi)
+    // Tanya apakah ingin kirim invoice
     setTimeout(() => {
       if (confirm(`Kirim invoice ke ${order.hp}?`)) {
         sendInvoice(order.id);
       }
     }, 500);
+  } else {
+    console.warn('Order not found or not in processing status:', orderId);
+    showToast('⚠️ Pesanan tidak ditemukan atau sudah selesai');
   }
 }
 
-// Batalkan pesanan
-function cancelOrder(id) {
+function cancelOrder(orderId) {
   if (!confirm('Batalkan pesanan ini? Pesanan akan dihapus.')) return;
-  const order = orders.find(x => x.id === id);
-  const orderName = order?.nama || id;
-  orders = orders.filter(o => o.id !== id);
-  renderOrders();
-  updateOrderBadge();
-  renderDashboard();
-  showToast(`❌ Pesanan ${orderName} dibatalkan`);
-  saveToLocalStorage();
-  syncToBackend('cancelOrder', { id });
+  
+  const orderIndex = orders.findIndex(x => x.id === orderId);
+  if (orderIndex !== -1) {
+    const orderName = orders[orderIndex].nama;
+    orders.splice(orderIndex, 1);
+    renderOrders();
+    updateOrderBadge();
+    renderDashboard();
+    showToast(`❌ Pesanan ${orderName} dibatalkan`);
+    saveToLocalStorage();
+    syncToBackend('cancelOrder', { id: orderId });
+  }
 }
 
 function updateOrderBadge() {
   const count = orders.filter(o => o.status === 'pending').length;
   const badge = document.getElementById('badge-orders');
-  badge.textContent = count;
-  badge.classList.toggle('show', count > 0);
+  if (badge) {
+    badge.textContent = count;
+    if (count > 0) {
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+  }
 }
 
-function showInvoice(id) {
-  const o = orders.find(x => x.id === id);
-  if (!o) return;
-  document.getElementById('inv-preview-content').innerHTML = `
-    <div class="inv-preview">
-      <div class="inv-head">
-        <div><div class="inv-brand-name">🍽️ Warung Sejahtera</div><div class="inv-brand-sub">Jl. Raya No. 12 · Tel 021-5550123</div></div>
-        <div class="inv-meta"><b>${o.id}</b><span>${o.time} · Antrian #${o.queue}</span></div>
-      </div>
-      <div class="inv-table-wrap">
-        <table style="width:100%">
-          <thead><tr><th>Item</th><th>Qty</th><th style="text-align:right">Subtotal</th></tr></thead>
-          <tbody>${o.items.map(i=>`<tr><td>${i.emoji} ${i.name}</td><td>${i.qty}</td><td style="text-align:right">${fmt(i.price*i.qty)}</td></tr>`).join('')}</tbody>
-        </table>
-      </div>
-      <div class="inv-sums">
-        <div class="inv-sum-row"><span>Subtotal</span><span>${fmt(o.sub)}</span></div>
-        <div class="inv-sum-row"><span>PPN 11%</span><span>${fmt(o.tax)}</span></div>
-        <div class="inv-sum-row grand"><span>Total</span><span>${fmt(o.total)}</span></div>
-      </div>
-      <div class="inv-foot">Terima kasih, ${o.nama}! Pesanan: ${o.type==='dine'?'Makan di tempat':'Bawa pulang'}</div>
-    </div>
-    <button class="btn-send-inv" onclick="sendInvoice('${o.id}')">📲 Kirim Invoice ke ${o.hp}</button>`;
-  document.getElementById('modal-invoice').classList.add('open');
-}
-
-async function sendInvoice(id) {
-  const order = orders.find(x => x.id === id);
+async function sendInvoice(orderId) {
+  const order = orders.find(x => x.id === orderId);
   if (!order) return;
-  showToast(`📲 Mengirim invoice ke ${order.hp}...`);
+  
   closeModal('modal-invoice');
+  showToast(`📲 Mengirim invoice ke ${order.hp}...`);
+  
   try {
-    await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'sendInvoice', orderId: id, phone: order.hp }) });
+    await fetch(SCRIPT_URL, { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'sendInvoice', orderId: orderId, phone: order.hp }) 
+    });
     showToast('✅ Invoice terkirim!');
   } catch(e) { 
-    showToast('✅ Invoice siap dikirim (simulasi)');
     // Simulasi kirim WhatsApp
-    const waUrl = `https://wa.me/${order.hp.replace(/^0/, '62')}?text=${encodeURIComponent(`Halo ${order.nama},\n\nInvoice pesanan Anda:\n${order.items.map(i=>`- ${i.name} x${i.qty} = ${fmt(i.price*i.qty)}`).join('\n')}\nTotal: ${fmt(order.total)}\n\nTerima kasih!`)}`;
+    const waUrl = `https://wa.me/${order.hp.replace(/^0/, '62').replace(/^62/, '62')}?text=${encodeURIComponent(
+      `Halo ${order.nama},\n\n*INVOICE PESANAN*\n` +
+      `Order ID: ${order.id}\n` +
+      `Antrian: #${order.queue}\n\n` +
+      order.items.map(i => `- ${i.emoji} ${i.name} x${i.qty} = ${fmt(i.price * i.qty)}`).join('\n') +
+      `\n\nSubtotal: ${fmt(order.sub)}` +
+      `\nPPN 11%: ${fmt(order.tax)}` +
+      `\n*TOTAL: ${fmt(order.total)}*` +
+      `\n\nTerima kasih telah memesan di Warung Sejahtera!`
+    )}`;
     window.open(waUrl, '_blank');
+    showToast('✅ Invoice siap dikirim via WhatsApp');
   }
+}
+
+function showInvoice(orderId) {
+  const order = orders.find(x => x.id === orderId);
+  if (!order) return;
+  
+  const modalContent = document.getElementById('inv-preview-content');
+  if (modalContent) {
+    modalContent.innerHTML = `
+      <div class="inv-preview">
+        <div class="inv-head">
+          <div><div class="inv-brand-name">🍽️ Warung Sejahtera</div><div class="inv-brand-sub">Jl. Raya No. 12 · Tel 021-5550123</div></div>
+          <div class="inv-meta"><b>${order.id}</b><span>${order.time} · Antrian #${order.queue}</span></div>
+        </div>
+        <div class="inv-table-wrap">
+          <table style="width:100%">
+            <thead><tr><th>Item</th><th>Qty</th><th style="text-align:right">Subtotal</th></tr></thead>
+            <tbody>${order.items.map(i=>`<tr><td>${i.emoji} ${i.name}</td><td>${i.qty}</td><td style="text-align:right">${fmt(i.price*i.qty)}</td></tr>`).join('')}</tbody>
+          </table>
+        </div>
+        <div class="inv-sums">
+          <div class="inv-sum-row"><span>Subtotal</span><span>${fmt(order.sub)}</span></div>
+          <div class="inv-sum-row"><span>PPN 11%</span><span>${fmt(order.tax)}</span></div>
+          <div class="inv-sum-row grand"><span>Total</span><span>${fmt(order.total)}</span></div>
+        </div>
+        <div class="inv-foot">Terima kasih, ${order.nama}! Pesanan: ${order.type==='dine'?'Makan di tempat':'Bawa pulang'}</div>
+      </div>
+      <button class="btn-send-inv" onclick="sendInvoice('${order.id}')">📲 Kirim Invoice ke ${order.hp}</button>`;
+  }
+  
+  const modal = document.getElementById('modal-invoice');
+  if (modal) modal.classList.add('open');
 }
 
 // ====== STOCK ======
@@ -269,9 +371,14 @@ function renderStock() {
   let alerts = '';
   if (out.length) alerts += `<div class="alert alert-warn">⚠️ Stok habis: ${out.map(m=>m.name).join(', ')}</div>`;
   if (low.length) alerts += `<div class="alert alert-warn">📦 Hampir habis: ${low.map(m=>m.name).join(', ')}</div>`;
-  document.getElementById('stock-alerts').innerHTML = alerts;
+  
+  const alertDiv = document.getElementById('stock-alerts');
+  if (alertDiv) alertDiv.innerHTML = alerts;
 
-  document.getElementById('stock-tbody').innerHTML = menuItems.map(m => `
+  const tbody = document.getElementById('stock-tbody');
+  if (!tbody) return;
+  
+  tbody.innerHTML = menuItems.map(m => `
     <tr>
       <td><span style="font-size:18px">${m.emoji}</span> ${m.name}<br><span style="font-size:11px;color:var(--c-muted)">${m.cat}</span></td>
       <td>${fmt(m.price)}</td>
@@ -283,11 +390,13 @@ function renderStock() {
         <button class="stk-btn" onclick="openEditMenu('${m.id}')">Edit</button>
         <button class="stk-btn-del" onclick="deleteMenu('${m.id}')">✕</button>
       </td>
-    </tr>`).join('');
+    </tr>
+  `).join('');
 }
 
 function openRestock(id) {
   const m = menuItems.find(x => x.id === id);
+  if (!m) return;
   document.getElementById('rst-id').value = id;
   document.getElementById('modal-restock-title').textContent = `Stok — ${m.emoji} ${m.name} (${m.stock})`;
   document.getElementById('rst-qty').value = 10;
@@ -304,7 +413,8 @@ function saveRestock() {
   else if (type === 'add') m.stock += qty;
   else if (type === 'sub') m.stock = Math.max(0, m.stock - qty);
   closeModal('modal-restock');
-  renderStock(); renderDashboard();
+  renderStock(); 
+  renderDashboard();
   showToast('✅ Stok diperbarui!');
   saveToLocalStorage();
   syncToBackend('updateStock', { id, stock: m.stock });
@@ -313,15 +423,21 @@ function saveRestock() {
 function openAddMenu() {
   editingMenuId = null;
   document.getElementById('modal-menu-title').textContent = 'Tambah Menu Baru';
-  ['mn-id','mn-name','mn-desc','mn-price','mn-stock'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('mn-emoji').value = '🍽️';
-  document.getElementById('mn-cat').value = 'makanan';
+  ['mn-id','mn-name','mn-desc','mn-price','mn-stock'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const emojiEl = document.getElementById('mn-emoji');
+  if (emojiEl) emojiEl.value = '🍽️';
+  const catEl = document.getElementById('mn-cat');
+  if (catEl) catEl.value = 'makanan';
   document.getElementById('modal-menu').classList.add('open');
 }
 
 function openEditMenu(id) {
   editingMenuId = id;
   const m = menuItems.find(x => x.id === id);
+  if (!m) return;
   document.getElementById('modal-menu-title').textContent = 'Edit Menu';
   document.getElementById('mn-id').value = id;
   document.getElementById('mn-emoji').value = m.emoji;
@@ -341,12 +457,14 @@ function saveMenu() {
 
   if (editingMenuId) {
     const m = menuItems.find(x => x.id === editingMenuId);
-    Object.assign(m, { 
-      name, price, stock, 
-      emoji: document.getElementById('mn-emoji').value, 
-      desc: document.getElementById('mn-desc').value, 
-      cat: document.getElementById('mn-cat').value 
-    });
+    if (m) {
+      m.name = name;
+      m.price = price;
+      m.stock = stock;
+      m.emoji = document.getElementById('mn-emoji').value;
+      m.desc = document.getElementById('mn-desc').value;
+      m.cat = document.getElementById('mn-cat').value;
+    }
   } else {
     menuItems.push({ 
       id: Date.now().toString(), 
@@ -357,7 +475,8 @@ function saveMenu() {
     });
   }
   closeModal('modal-menu');
-  renderStock(); renderDashboard();
+  renderStock(); 
+  renderDashboard();
   showToast('✅ Menu disimpan!');
   saveToLocalStorage();
   syncToBackend('saveMenu', { menu: menuItems });
@@ -365,9 +484,10 @@ function saveMenu() {
 
 function deleteMenu(id) {
   const m = menuItems.find(x => x.id === id);
-  if (!confirm(`Hapus menu "${m.name}"?`)) return;
+  if (!m || !confirm(`Hapus menu "${m.name}"?`)) return;
   menuItems = menuItems.filter(x => x.id !== id);
-  renderStock(); renderDashboard();
+  renderStock(); 
+  renderDashboard();
   showToast('🗑️ Menu dihapus');
   saveToLocalStorage();
   syncToBackend('deleteMenu', { id });
@@ -387,8 +507,8 @@ function saveConfig() {
   if (newPass) {
     localStorage.setItem('adminPass', newPass);
   }
-  localStorage.setItem('taxRate', tax);
-  localStorage.setItem('lowStockAlert', lowStock);
+  if (tax) localStorage.setItem('taxRate', tax);
+  if (lowStock) localStorage.setItem('lowStockAlert', lowStock);
   
   showToast('✅ Konfigurasi disimpan!');
 }
@@ -402,8 +522,12 @@ function saveToLocalStorage() {
 function loadFromLocalStorage() {
   const savedOrders = localStorage.getItem('warung_orders');
   const savedMenu = localStorage.getItem('warung_menu');
-  if (savedOrders) orders = JSON.parse(savedOrders);
-  if (savedMenu) menuItems = JSON.parse(savedMenu);
+  if (savedOrders) {
+    try { orders = JSON.parse(savedOrders); } catch(e) {}
+  }
+  if (savedMenu) {
+    try { menuItems = JSON.parse(savedMenu); } catch(e) {}
+  }
 }
 
 async function syncToBackend(action, data) {
@@ -416,11 +540,16 @@ async function syncToBackend(action, data) {
   } catch(e) { console.log('Sync error:', e); }
 }
 
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModal(id) { 
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove('open'); 
+}
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  if (!t) return;
+  t.textContent = msg; 
+  t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
@@ -435,7 +564,11 @@ function escapeHtml(str) {
 }
 
 // ====== INIT ======
-document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('id-ID', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const dateEl = document.getElementById('topbar-date');
+if (dateEl) {
+  dateEl.textContent = new Date().toLocaleDateString('id-ID', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
 loadFromLocalStorage();
 renderAll();
 
