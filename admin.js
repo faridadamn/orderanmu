@@ -5,17 +5,17 @@ const ADMIN_PASS = localStorage.getItem('adminPass') || 'admin123';
 
 const fmt = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
 
-// Sample data
+// Sample data dengan ID yang unik dan konsisten
 let orders = [
-  {id:'ORD-100001',queue:1,nama:'Romeo',hp:'081234567890',type:'takeaway',note:'pedes bwang',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1}],sub:38000,tax:4180,total:42180,status:'pending',time:'08:24',date:'14/04/2025'},
-  {id:'ORD-100002',queue:2,nama:'Yayat',hp:'6281212686654',type:'takeaway',note:'Bawang semua',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1},{name:'Es Teh',emoji:'🧊',price:5000,qty:2}],sub:48000,tax:5280,total:53280,status:'pending',time:'08:31',date:'14/04/2025'},
-  {id:'ORD-100003',queue:3,nama:'Ahmad Rizky',hp:'08345678901',type:'dine',note:'',items:[{name:'Mie Ayam',emoji:'🍜',price:15000,qty:1}],sub:15000,tax:1650,total:16650,status:'pending',time:'08:15',date:'14/04/2025'},
+  {id:'ORD-001',queue:1,nama:'jeremi teti',hp:'89890991234',type:'takeaway',note:'hmmm',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1},{name:'Ayam Bakar Madu',emoji:'🍗',price:25000,qty:1}],sub:63000,tax:6930,total:69930,status:'pending',time:'08:24',date:'14/04/2025'},
+  {id:'ORD-002',queue:2,nama:'romeo',hp:'81234567890',type:'takeaway',note:'pedes bwang',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1}],sub:38000,tax:4180,total:42180,status:'pending',time:'08:31',date:'14/04/2025'},
+  {id:'ORD-003',queue:3,nama:'Yayat',hp:'6281212686654',type:'takeaway',note:'Bawang semua',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1},{name:'Ayam Bakar Madu',emoji:'🍗',price:25000,qty:1}],sub:48000,tax:5280,total:53280,status:'pending',time:'08:15',date:'14/04/2025'},
 ];
 
 let menuItems = [
   {id:'1',name:'Nasi Padang',price:15000,emoji:'🍚',cat:'makanan',desc:'Nasi dengan lauk padang',stock:22,sold:134},
   {id:'2',name:'Kuli Jawa',price:8000,emoji:'🥤',cat:'minuman',desc:'Minuman segar',stock:10,sold:89},
-  {id:'3',name:'Es Teh',price:5000,emoji:'🧊',cat:'minuman',desc:'Teh manis dingin',stock:50,sold:200},
+  {id:'3',name:'Ayam Bakar Madu',price:25000,emoji:'🍗',cat:'makanan',desc:'Ayam bakar madu',stock:5,sold:67},
 ];
 
 let currentOrderFilter = 'semua';
@@ -106,7 +106,7 @@ function renderDashboard() {
   document.getElementById('dash-alert').innerHTML = alertHtml;
 }
 
-// ====== ORDERS - Menggunakan Event Delegation ======
+// ====== ORDERS - Render dengan onclick langsung ======
 function filterOrders(f, btn) {
   currentOrderFilter = f;
   document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
@@ -127,7 +127,7 @@ function renderOrders() {
   for (let i = 0; i < list.length; i++) {
     const o = list[i];
     html += `
-      <div class="order-card" data-order-id="${o.id}" data-order-status="${o.status}">
+      <div class="order-card" data-order-id="${o.id}">
         <div class="order-num">${String(o.queue).padStart(2,'0')}</div>
         <div class="order-info">
           <div class="order-top">
@@ -147,9 +147,13 @@ function renderOrders() {
           </div>
         </div>
         <div class="order-actions">
-          ${o.status==='pending' ? `<button class="btn-process" data-id="${o.id}" data-action="process">✅ Proses</button><button class="btn-cancel-order" data-id="${o.id}" data-action="cancel">✕ Batalkan</button>` : ''}
-          ${o.status==='processing' ? `<button class="btn-done" data-id="${o.id}" data-action="done">✓ Selesai</button>` : ''}
-          ${o.status==='done' ? `<button class="btn-invoice" data-id="${o.id}" data-action="invoice">📄 Invoice</button>` : ''}
+          ${o.status==='pending' ? 
+            `<button class="btn-process" onclick="processOrder('${o.id}')">✅ Proses</button>
+             <button class="btn-cancel-order" onclick="cancelOrder('${o.id}')">✕ Batalkan</button>` : ''}
+          ${o.status==='processing' ? 
+            `<button class="btn-done" onclick="doneOrder('${o.id}')">✓ Selesai</button>` : ''}
+          ${o.status==='done' ? 
+            `<button class="btn-invoice" onclick="showInvoice('${o.id}')">📄 Invoice</button>` : ''}
         </div>
       </div>
     `;
@@ -158,115 +162,95 @@ function renderOrders() {
   document.getElementById('order-list').innerHTML = html;
 }
 
-// EVENT DELEGATION - Satu listener untuk semua tombol
-document.addEventListener('click', function(e) {
-  // Tombol Proses
-  if (e.target.classList && e.target.classList.contains('btn-process')) {
-    const orderId = e.target.getAttribute('data-id');
-    if (orderId) {
-      console.log('Process button clicked for:', orderId);
-      processOrder(orderId);
-    }
-    return;
-  }
-  
-  // Tombol Selesai
-  if (e.target.classList && e.target.classList.contains('btn-done')) {
-    const orderId = e.target.getAttribute('data-id');
-    if (orderId) {
-      console.log('Done button clicked for:', orderId);
-      doneOrder(orderId);
-    }
-    return;
-  }
-  
-  // Tombol Batalkan
-  if (e.target.classList && e.target.classList.contains('btn-cancel-order')) {
-    const orderId = e.target.getAttribute('data-id');
-    if (orderId) {
-      console.log('Cancel button clicked for:', orderId);
-      cancelOrder(orderId);
-    }
-    return;
-  }
-  
-  // Tombol Invoice
-  if (e.target.classList && e.target.classList.contains('btn-invoice')) {
-    const orderId = e.target.getAttribute('data-id');
-    if (orderId) {
-      showInvoice(orderId);
-    }
-    return;
-  }
-});
-
 // ====== ORDER ACTIONS ======
 function processOrder(orderId) {
-  console.log('Processing order:', orderId);
-  console.log('Current orders:', orders);
+  console.log('=== PROCESS ORDER CALLED ===');
+  console.log('Order ID:', orderId);
+  console.log('Current orders:', orders.map(o => ({id: o.id, status: o.status})));
   
-  const orderIndex = orders.findIndex(x => x.id === orderId);
-  console.log('Order index:', orderIndex);
+  // Cari order berdasarkan ID
+  const order = orders.find(o => o.id === orderId);
   
-  if (orderIndex !== -1 && orders[orderIndex].status === 'pending') {
-    orders[orderIndex].status = 'processing';
-    renderOrders();
-    updateOrderBadge();
-    renderDashboard();
-    showToast(`✅ Pesanan #${orders[orderIndex].queue} (${orders[orderIndex].nama}) sedang diproses`);
-    
-    // Simpan ke localStorage
-    saveToLocalStorage();
-    syncToBackend('updateOrder', { id: orderId, status: 'processing' });
-  } else {
-    console.warn('Order not found or not in pending status:', orderId);
-    showToast('⚠️ Pesanan tidak ditemukan atau sudah diproses');
+  if (!order) {
+    console.error('Order not found! ID:', orderId);
+    showToast('⚠️ Pesanan tidak ditemukan!');
+    return;
   }
+  
+  if (order.status !== 'pending') {
+    console.warn('Order status is not pending:', order.status);
+    showToast(`⚠️ Pesanan sedang ${order.status === 'processing' ? 'diproses' : 'selesai'}`);
+    return;
+  }
+  
+  // Update status
+  order.status = 'processing';
+  console.log('Order updated to processing');
+  
+  // Re-render
+  renderOrders();
+  updateOrderBadge();
+  renderDashboard();
+  
+  showToast(`✅ Pesanan #${order.queue} (${order.nama}) sedang diproses`);
+  
+  // Simpan ke localStorage
+  saveToLocalStorage();
+  syncToBackend('updateOrder', { id: orderId, status: 'processing' });
 }
 
 function doneOrder(orderId) {
-  console.log('Completing order:', orderId);
-  const orderIndex = orders.findIndex(x => x.id === orderId);
+  console.log('=== DONE ORDER CALLED ===');
+  console.log('Order ID:', orderId);
   
-  if (orderIndex !== -1 && orders[orderIndex].status === 'processing') {
-    const order = orders[orderIndex];
-    order.status = 'done';
-    
-    // Kurangi stok untuk item yang dipesan
-    order.items.forEach(item => {
-      const menu = menuItems.find(m => m.name === item.name);
-      if (menu) {
-        menu.stock = Math.max(0, menu.stock - item.qty);
-        menu.sold = (menu.sold || 0) + item.qty;
-      }
-    });
-    
-    renderOrders();
-    updateOrderBadge();
-    renderDashboard();
-    renderStock();
-    showToast(`🎉 Pesanan #${order.queue} (${order.nama}) selesai!`);
-    
-    // Simpan ke localStorage
-    saveToLocalStorage();
-    syncToBackend('completeOrder', { id: orderId, status: 'done' });
-    
-    // Tanya apakah ingin kirim invoice
-    setTimeout(() => {
-      if (confirm(`Kirim invoice ke ${order.hp}?`)) {
-        sendInvoice(order.id);
-      }
-    }, 500);
-  } else {
-    console.warn('Order not found or not in processing status:', orderId);
-    showToast('⚠️ Pesanan tidak ditemukan atau sudah selesai');
+  const order = orders.find(o => o.id === orderId);
+  
+  if (!order) {
+    console.error('Order not found!');
+    showToast('⚠️ Pesanan tidak ditemukan!');
+    return;
   }
+  
+  if (order.status !== 'processing') {
+    showToast(`⚠️ Pesanan belum diproses`);
+    return;
+  }
+  
+  order.status = 'done';
+  
+  // Kurangi stok untuk item yang dipesan
+  order.items.forEach(item => {
+    const menu = menuItems.find(m => m.name === item.name);
+    if (menu) {
+      menu.stock = Math.max(0, menu.stock - item.qty);
+      menu.sold = (menu.sold || 0) + item.qty;
+    }
+  });
+  
+  renderOrders();
+  updateOrderBadge();
+  renderDashboard();
+  renderStock();
+  
+  showToast(`🎉 Pesanan #${order.queue} (${order.nama}) selesai!`);
+  
+  saveToLocalStorage();
+  syncToBackend('completeOrder', { id: orderId, status: 'done' });
+  
+  // Tanya kirim invoice
+  setTimeout(() => {
+    if (confirm(`Kirim invoice ke ${order.hp}?`)) {
+      sendInvoice(order.id);
+    }
+  }, 500);
 }
 
 function cancelOrder(orderId) {
+  console.log('=== CANCEL ORDER CALLED ===');
+  
   if (!confirm('Batalkan pesanan ini? Pesanan akan dihapus.')) return;
   
-  const orderIndex = orders.findIndex(x => x.id === orderId);
+  const orderIndex = orders.findIndex(o => o.id === orderId);
   if (orderIndex !== -1) {
     const orderName = orders[orderIndex].nama;
     orders.splice(orderIndex, 1);
@@ -276,6 +260,8 @@ function cancelOrder(orderId) {
     showToast(`❌ Pesanan ${orderName} dibatalkan`);
     saveToLocalStorage();
     syncToBackend('cancelOrder', { id: orderId });
+  } else {
+    showToast('⚠️ Pesanan tidak ditemukan');
   }
 }
 
@@ -284,16 +270,12 @@ function updateOrderBadge() {
   const badge = document.getElementById('badge-orders');
   if (badge) {
     badge.textContent = count;
-    if (count > 0) {
-      badge.classList.add('show');
-    } else {
-      badge.classList.remove('show');
-    }
+    badge.style.display = count > 0 ? 'block' : 'none';
   }
 }
 
 async function sendInvoice(orderId) {
-  const order = orders.find(x => x.id === orderId);
+  const order = orders.find(o => o.id === orderId);
   if (!order) return;
   
   closeModal('modal-invoice');
@@ -307,7 +289,6 @@ async function sendInvoice(orderId) {
     });
     showToast('✅ Invoice terkirim!');
   } catch(e) { 
-    // Simulasi kirim WhatsApp
     const waUrl = `https://wa.me/${order.hp.replace(/^0/, '62').replace(/^62/, '62')}?text=${encodeURIComponent(
       `Halo ${order.nama},\n\n*INVOICE PESANAN*\n` +
       `Order ID: ${order.id}\n` +
@@ -324,7 +305,7 @@ async function sendInvoice(orderId) {
 }
 
 function showInvoice(orderId) {
-  const order = orders.find(x => x.id === orderId);
+  const order = orders.find(o => o.id === orderId);
   if (!order) return;
   
   const modalContent = document.getElementById('inv-preview-content');
@@ -355,7 +336,7 @@ function showInvoice(orderId) {
   if (modal) modal.classList.add('open');
 }
 
-// ====== STOCK ======
+// ====== STOCK FUNCTIONS ======
 function renderStock() {
   const low = menuItems.filter(m => m.stock > 0 && m.stock <= 5);
   const out = menuItems.filter(m => m.stock === 0);
