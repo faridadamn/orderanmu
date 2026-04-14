@@ -30,6 +30,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--c-cream
 .topbar-title { flex: 1; }
 .topbar-title h1 { font-size: 15px; font-weight: 500; }
 .topbar-title p { font-size: 12px; color: rgba(255,255,255,0.5); }
+.topbar-track { background:rgba(255,255,255,0.1); border:none; color:rgba(255,255,255,0.8); padding:7px 13px; border-radius:20px; font-size:12px; cursor:pointer; font-family:var(--font-b); white-space:nowrap; flex-shrink:0; }
 .topbar-cart {
   position: relative; background: var(--c-gold); border: none; color: var(--c-dark);
   width: 42px; height: 42px; border-radius: 50%; font-size: 18px; cursor: pointer;
@@ -65,7 +66,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--c-cream
   white-space: nowrap; transition: all 0.15s;
 }
 .cat-chip.active { background: var(--c-dark); color: white; border-color: var(--c-dark); }
-.menu-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+.menu-list { padding: 12px 16px; padding-bottom: 100px; display: flex; flex-direction: column; gap: 10px; }
 .item-card {
   background: var(--c-white); border-radius: 14px; border: 1px solid var(--c-border);
   display: flex; align-items: center; gap: 14px; padding: 12px 14px;
@@ -103,6 +104,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--c-cream
   padding: 14px 16px; padding-bottom: max(14px, env(safe-area-inset-bottom));
   display: none; align-items: center; justify-content: space-between;
   cursor: pointer; transition: transform 0.3s;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
 }
 .cart-bar.show { display: flex; }
 .cart-bar-left { display: flex; align-items: center; gap: 12px; }
@@ -140,7 +142,8 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--c-cream
   background: var(--c-gold); color: var(--c-dark); border: none;
   border-radius: 14px; font-size: 16px; font-weight: 500;
   font-family: var(--font-b); cursor: pointer; width: calc(100% - 32px);
-  transition: background 0.2s; margin-bottom: 16px;
+  transition: background 0.2s;
+  margin-bottom: max(24px, env(safe-area-inset-bottom, 24px));
 }
 .checkout-btn:active { background: var(--c-gold-l); }
 .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -180,6 +183,60 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--c-cream
 
 /* SAFE AREA */
 .safe-bottom { height: env(safe-area-inset-bottom, 0); }
+
+/* TRACK ORDER PAGE */
+.track-page { padding: 16px 16px max(80px, calc(env(safe-area-inset-bottom) + 16px)); }
+.track-hero { text-align: center; padding: 24px 0 20px; }
+.track-hero h2 { font-family: var(--font-d); font-size: 24px; color: var(--c-text); margin-bottom: 6px; }
+.track-hero p { font-size: 14px; color: var(--c-muted); }
+.track-form { background: var(--c-white); border-radius: 14px; border: 1px solid var(--c-border); padding: 16px; margin-bottom: 16px; }
+.track-form label { display: block; font-size: 13px; color: var(--c-muted); margin-bottom: 8px; font-weight: 500; }
+.track-input-row { display: flex; gap: 10px; }
+.track-input-row input {
+  flex: 1; padding: 12px 14px; border-radius: 10px;
+  border: 1px solid var(--c-border); font-size: 14px; font-family: var(--font-b); color: var(--c-text);
+}
+.track-input-row input:focus { border-color: var(--c-gold); outline: none; }
+.btn-track { padding: 12px 20px; background: var(--c-dark); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: var(--font-b); white-space: nowrap; }
+.btn-track:active { background: var(--c-gold); color: var(--c-dark); }
+.track-result { margin-top: 4px; }
+.track-card { background: var(--c-white); border-radius: 16px; border: 1px solid var(--c-border); overflow: hidden; margin-bottom: 12px; }
+.track-card-header { background: var(--c-dark); padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+.track-queue-big { font-family: var(--font-d); font-size: 48px; color: var(--c-gold); font-weight: 700; line-height: 1; }
+.track-order-info { text-align: right; }
+.track-order-id { font-size: 11px; color: rgba(255,255,255,0.45); }
+.track-order-name { font-size: 15px; color: white; font-weight: 500; margin-top: 2px; }
+.track-order-type { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.track-card-body { padding: 16px; }
+.track-status-stepper { display: flex; flex-direction: column; gap: 0; margin-bottom: 16px; }
+.track-step { display: flex; gap: 14px; align-items: flex-start; }
+.track-step-left { display: flex; flex-direction: column; align-items: center; width: 20px; }
+.track-step-dot { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+.tsd-done { background: #1D9E75; color: white; }
+.tsd-active { background: var(--c-gold); color: var(--c-dark); animation: pulse-dot 1.5s infinite; }
+.tsd-wait { background: rgba(0,0,0,0.08); color: var(--c-muted); }
+@keyframes pulse-dot { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+.track-step-line { width: 2px; height: 24px; background: var(--c-border); margin: 2px 0; }
+.track-step-line.done { background: #1D9E75; }
+.track-step-right { padding-bottom: 24px; }
+.track-step-title { font-size: 14px; font-weight: 500; color: var(--c-text); }
+.track-step-sub { font-size: 12px; color: var(--c-muted); margin-top: 2px; }
+.track-items-mini { border-top: 1px solid var(--c-border); padding-top: 12px; }
+.track-items-mini-title { font-size: 12px; color: var(--c-muted); margin-bottom: 8px; font-weight: 500; }
+.track-item-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--c-text); padding: 3px 0; }
+.track-total-row { display: flex; justify-content: space-between; font-size: 14px; font-weight: 500; color: var(--c-text); padding-top: 8px; margin-top: 6px; border-top: 1px solid var(--c-border); }
+.track-empty { text-align: center; padding: 32px 0; color: var(--c-muted); font-size: 14px; }
+.track-empty-icon { font-size: 40px; margin-bottom: 12px; }
+.track-recent { margin-top: 16px; }
+.track-recent-title { font-size: 13px; font-weight: 500; color: var(--c-muted); margin-bottom: 10px; }
+.track-recent-item { background: var(--c-white); border-radius: 12px; border: 1px solid var(--c-border); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; cursor: pointer; }
+.track-recent-item:active { background: var(--c-cream); }
+.tri-left .tri-id { font-size: 12px; color: var(--c-muted); }
+.tri-left .tri-name { font-size: 14px; font-weight: 500; margin-top: 2px; }
+.tri-status { font-size: 11px; padding: 3px 10px; border-radius: 100px; }
+.tri-pending { background: #FAEEDA; color: #633806; }
+.tri-processing { background: #E6F1FB; color: #185FA5; }
+.tri-done { background: #E1F5EE; color: #085041; }
 </style>
 </head>
 <body>
@@ -196,6 +253,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--c-cream
     <h1 id="page-title">Menu</h1>
     <p>Warung Makan Sejahtera</p>
   </div>
+  <button class="topbar-track" id="track-btn" onclick="showTrack()">Lacak</button>
   <button class="topbar-cart" onclick="showCart()" id="cart-btn">
     🛒 <span class="cart-badge" id="cart-badge"></span>
   </button>
@@ -207,7 +265,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--c-cream
     <input type="text" placeholder="Cari menu..." oninput="searchMenu(this.value)" id="search-input">
   </div>
   <div class="cats-bar" id="cats-bar"></div>
-  <div class="menu-list" id="menu-list" style="padding-bottom:100px"></div>
+  <div class="menu-list" id="menu-list"></div>
 </div>
 
 <!-- CART PAGE -->
@@ -229,7 +287,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--c-cream
     </div>
     <div class="form-field">
       <label>Tipe pesanan *</label>
-      <select id="inp-type" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--c-border);font-size:15px;font-family:var(--font-b);background:var(--c-white);color:var(--c-text)">
+      <select id="inp-type">
         <option value="dine">Makan di tempat</option>
         <option value="takeaway">Bawa pulang</option>
       </select>
@@ -253,6 +311,28 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--c-cream
   <div class="queue-page" id="queue-content"></div>
 </div>
 
+<!-- TRACK ORDER PAGE -->
+<div class="page" id="pg-track">
+  <div class="track-page">
+    <div class="track-hero">
+      <h2>Lacak Pesanan</h2>
+      <p>Masukkan nomor HP kamu untuk cek status</p>
+    </div>
+    <div class="track-form">
+      <label>Nomor HP yang digunakan saat pesan</label>
+      <div class="track-input-row">
+        <input type="tel" id="track-hp" placeholder="contoh: 08123456789" onkeydown="if(event.key==='Enter')doTrack()">
+        <button class="btn-track" onclick="doTrack()">Cari</button>
+      </div>
+    </div>
+    <div class="track-result" id="track-result"></div>
+    <div class="track-recent" id="track-recent" style="display:none">
+      <div class="track-recent-title">Pesanan terakhirmu</div>
+      <div id="track-recent-list"></div>
+    </div>
+  </div>
+</div>
+
 <div class="cart-bar" id="cart-bar" onclick="showCart()">
   <div class="cart-bar-left">
     <div class="cart-count" id="cbar-count">0</div>
@@ -262,7 +342,7 @@ html, body { height: 100%; font-family: var(--font-b); background: var(--c-cream
 </div>
 
 <script>
-// ====== CONFIG — ganti URL ini setelah deploy Apps Script ======
+// ====== CONFIG ======
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxmIgqUCx5q-sMKX3-kPm6FVTsrg-AqLlbbTD6zY5kpDUciIH-T5FmqS5bkVmdwgfNtMQ/exec';
 // =============================================================
 
@@ -273,13 +353,19 @@ let searchQ = '';
 
 const fmt = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
 
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
 async function loadMenu() {
   try {
     const res = await fetch(SCRIPT_URL + '?action=getMenu');
     const data = await res.json();
     menuData = data.menu || [];
   } catch(e) {
-    // fallback demo data
     menuData = [
       {id:'1',name:'Nasi Goreng Spesial',price:18000,emoji:'🍳',cat:'makanan',desc:'Nasi goreng bumbu rahasia dengan telur mata sapi',stock:24},
       {id:'2',name:'Mie Ayam Bakso',price:15000,emoji:'🍜',cat:'makanan',desc:'Mie kenyal dengan topping ayam dan bakso segar',stock:12},
@@ -362,7 +448,7 @@ function updateCartUI() {
   badge.style.display = totalQty > 0 ? 'flex' : 'none';
 
   const bar = document.getElementById('cart-bar');
-  if (totalQty > 0) {
+  if (totalQty > 0 && document.getElementById('pg-menu').classList.contains('active')) {
     bar.classList.add('show');
     document.getElementById('cbar-count').textContent = totalQty;
     document.getElementById('cbar-text').textContent = totalQty + ' item dipilih';
@@ -375,7 +461,6 @@ function updateCartUI() {
 function showCart() {
   setPage('cart');
   document.getElementById('page-title').textContent = 'Keranjang';
-  document.getElementById('cart-btn').style.display = 'none';
 
   const ids = Object.keys(cart);
   const totalQty = ids.reduce((a, id) => a + cart[id], 0);
@@ -409,11 +494,14 @@ function showCart() {
 }
 
 function goBack() {
-  if (document.getElementById('pg-cart').classList.contains('active')) {
+  const onCart = document.getElementById('pg-cart').classList.contains('active');
+  const onQueue = document.getElementById('pg-queue').classList.contains('active');
+  const onTrack = document.getElementById('pg-track').classList.contains('active');
+  if (onCart || onTrack) {
     setPage('menu');
     document.getElementById('page-title').textContent = 'Menu';
-    document.getElementById('cart-btn').style.display = 'flex';
-  } else if (document.getElementById('pg-queue').classList.contains('active')) {
+    updateCartUI();
+  } else if (onQueue) {
     window.location.href = 'index.html';
   } else {
     window.location.href = 'index.html';
@@ -423,14 +511,151 @@ function goBack() {
 function setPage(pg) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('pg-' + pg).classList.add('active');
+  if (pg === 'menu') {
+    updateCartUI();
+  } else {
+    document.getElementById('cart-bar').classList.remove('show');
+  }
   window.scrollTo(0, 0);
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+function showTrack() {
+  setPage('track');
+  document.getElementById('page-title').textContent = 'Lacak Pesanan';
+  const recent = getRecentOrders();
+  if (recent.length) {
+    document.getElementById('track-recent').style.display = 'block';
+    document.getElementById('track-recent-list').innerHTML = recent.map(o => `
+      <div class="track-recent-item" onclick="showTrackResult(${JSON.stringify(o).replace(/"/g,'&quot;')})">
+        <div class="tri-left">
+          <div class="tri-id">${o.orderId} · Antrian #${o.queue}</div>
+          <div class="tri-name">${o.nama}</div>
+        </div>
+        <span class="tri-status ${o.status === 'done' ? 'tri-done' : o.status === 'processing' ? 'tri-processing' : 'tri-pending'}">${o.status === 'done' ? 'Selesai' : o.status === 'processing' ? 'Diproses' : 'Menunggu'}</span>
+      </div>`).join('');
+  } else {
+    document.getElementById('track-recent').style.display = 'none';
+  }
+  // Reset hasil pencarian
+  document.getElementById('track-result').innerHTML = '';
+  document.getElementById('track-hp').value = '';
+}
+
+function getRecentOrders() {
+  try { return JSON.parse(localStorage.getItem('warungsejahtera_orders') || '[]'); } catch(e) { return []; }
+}
+
+function saveRecentOrder(order) {
+  try {
+    let list = getRecentOrders();
+    list = list.filter(o => o.orderId !== order.orderId);
+    list.unshift(order);
+    list = list.slice(0, 10);
+    localStorage.setItem('warungsejahtera_orders', JSON.stringify(list));
+  } catch(e) {}
+}
+
+// UPDATE STATUS PESANAN (untuk demo, bisa diubah manual)
+function updateOrderStatus(orderId, newStatus) {
+  let list = getRecentOrders();
+  const index = list.findIndex(o => o.orderId === orderId);
+  if (index !== -1) {
+    list[index].status = newStatus;
+    localStorage.setItem('warungsejahtera_orders', JSON.stringify(list));
+    showToast(`Status pesanan ${orderId} diubah menjadi ${newStatus}`);
+    return true;
+  }
+  return false;
+}
+
+async function doTrack() {
+  const hp = document.getElementById('track-hp').value.trim();
+  if (!hp) { showToast('⚠️ Masukkan nomor HP'); return; }
+  document.getElementById('track-result').innerHTML = '<div class="track-empty"><div class="track-empty-icon">🔍</div>Mencari pesanan...</div>';
+
+  // Cari dari localStorage dulu
+  let orders = getRecentOrders().filter(o => o.hp === hp);
+  
+  // Urutkan berdasarkan waktu terbaru
+  orders.sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
+
+  if (!orders.length) {
+    document.getElementById('track-result').innerHTML = `
+      <div class="track-empty">
+        <div class="track-empty-icon">🤷</div>
+        Tidak ada pesanan untuk nomor <strong>${hp}</strong><br>
+        <span style="font-size:12px;margin-top:6px;display:block">Pastikan nomor HP sama dengan saat memesan</span>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('track-result').innerHTML = orders.map(o => buildTrackCard(o)).join('');
+}
+
+function showTrackResult(order) {
+  document.getElementById('track-result').innerHTML = buildTrackCard(order);
+  document.getElementById('track-recent').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+function buildTrackCard(o) {
+  const fmt2 = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+  const steps = [
+    { key: 'pending',    label: 'Pesanan diterima',   sub: 'Menunggu konfirmasi dapur' },
+    { key: 'processing', label: 'Sedang dimasak',      sub: 'Pesanan sedang disiapkan' },
+    { key: 'done',       label: 'Pesanan selesai',     sub: 'Silakan ambil pesananmu' },
+  ];
+  const statusOrder = ['pending', 'processing', 'done'];
+  const currentIdx = statusOrder.indexOf(o.status || 'pending');
+
+  const stepsHtml = steps.map((s, i) => {
+    const isDone = i < currentIdx;
+    const isActive = i === currentIdx;
+    const isWait = i > currentIdx;
+    const dotClass = isDone ? 'tsd-done' : isActive ? 'tsd-active' : 'tsd-wait';
+    const dotIcon = isDone ? '✓' : isActive ? '●' : String(i+1);
+    const lineClass = isDone ? 'done' : '';
+    return `
+      <div class="track-step">
+        <div class="track-step-left">
+          <div class="track-step-dot ${dotClass}">${dotIcon}</div>
+          ${i < steps.length-1 ? `<div class="track-step-line ${lineClass}"></div>` : ''}
+        </div>
+        <div class="track-step-right">
+          <div class="track-step-title" style="${isWait?'color:var(--c-muted)':''}">${s.label}</div>
+          <div class="track-step-sub">${isActive ? '<strong style="color:var(--c-gold)">'+s.sub+'</strong>' : s.sub}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const itemsHtml = (o.items || []).map(i =>
+    `<div class="track-item-row"><span>${i.emoji} ${i.name} ×${i.qty}</span><span>${fmt2(i.price * i.qty)}</span></div>`
+  ).join('');
+
+  const totalVal = o.total || (o.sub || 0) + (o.tax || 0);
+
+  return `
+    <div class="track-card">
+      <div class="track-card-header">
+        <div class="track-queue-big">${String(o.queue).padStart(2,'0')}</div>
+        <div class="track-order-info">
+          <div class="track-order-id">${o.orderId}</div>
+          <div class="track-order-name">${o.nama}</div>
+          <div class="track-order-type">${o.type === 'dine' ? 'Makan di tempat' : 'Bawa pulang'}</div>
+        </div>
+      </div>
+      <div class="track-card-body">
+        <div class="track-status-stepper">${stepsHtml}</div>
+        ${itemsHtml ? `<div class="track-items-mini">
+          <div class="track-items-mini-title">Rincian pesanan</div>
+          ${itemsHtml}
+          <div class="track-total-row"><span>Total</span><span>${fmt2(totalVal)}</span></div>
+        </div>` : ''}
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--c-border);font-size:11px;color:var(--c-muted);text-align:center">
+          ${o.date || ''} ${o.time || ''}
+        </div>
+      </div>
+    </div>`;
 }
 
 async function doCheckout() {
@@ -455,7 +680,7 @@ async function doCheckout() {
   document.getElementById('spinner').classList.add('show');
   document.getElementById('checkout-btn').disabled = true;
 
-  let queueNum = '—';
+  let queueNum = Math.floor(Math.random() * 50) + 1;
   let orderId = 'ORD-' + Date.now().toString().slice(-6);
 
   try {
@@ -465,16 +690,21 @@ async function doCheckout() {
     });
     const data = await res.json();
     if (data.success) { queueNum = data.queueNum; orderId = data.orderId; }
-  } catch(e) {
-    queueNum = Math.floor(Math.random() * 50) + 1;
-  }
+  } catch(e) {}
 
   document.getElementById('spinner').classList.remove('show');
+
+  const orderRecord = { 
+    orderId, queue: queueNum, nama, hp, type, items, sub, tax, total, 
+    status: 'pending', 
+    time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}),
+    date: new Date().toLocaleDateString('id-ID')
+  };
+  saveRecentOrder(orderRecord);
 
   Object.keys(cart).forEach(k => delete cart[k]);
   updateCartUI();
 
-  document.getElementById('cart-btn').style.display = 'none';
   document.getElementById('page-title').textContent = 'Antrian';
 
   document.getElementById('queue-content').innerHTML = `
@@ -493,12 +723,38 @@ async function doCheckout() {
       <div class="qi-total"><span>Total</span><span>${fmt(total)}</span></div>
     </div>
     <div class="queue-note">Invoice akan dikirimkan setelah pesanan selesai diproses. Tunjukkan nomor antrian ini ke kasir.</div>
-    <button class="btn-back-home" onclick="window.location.href='index.html'">← Kembali ke beranda</button>
+    <div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;justify-content:center">
+      <button style="padding:12px 24px;background:var(--c-gold);color:var(--c-dark);border:none;border-radius:100px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-b)" onclick="showTrack();document.getElementById('track-hp').value='${hp}';doTrack()">🔍 Lacak Pesanan</button>
+      <button class="btn-back-home" onclick="window.location.href='index.html'">← Beranda</button>
+    </div>
   `;
   setPage('queue');
 }
 
 loadMenu();
+
+// Demo: Tambah data contoh untuk testing (hapus nanti)
+setTimeout(() => {
+  const existingOrders = getRecentOrders();
+  if (existingOrders.length === 0) {
+    const sampleOrder = {
+      orderId: 'ORD-20260414-001',
+      queue: 1,
+      nama: 'Romeo',
+      hp: '081234567890',
+      type: 'dine',
+      items: [{id:'1',name:'Nasi Goreng Spesial',emoji:'🍳',price:18000,qty:2}],
+      sub: 36000,
+      tax: 3960,
+      total: 39960,
+      status: 'pending',
+      time: '14:30',
+      date: '14/04/2025'
+    };
+    saveRecentOrder(sampleOrder);
+    console.log('Sample order added for testing');
+  }
+}, 1000);
 </script>
 </body>
 </html>
