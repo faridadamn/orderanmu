@@ -1,0 +1,19 @@
+{
+  "name": "Warung Makan Sejahtera",
+  "short_name": "Warung Sejahtera",
+  "description": "Sistem pemesanan digital untuk warung makan",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#1a1208",
+  "theme_color": "#1a1208",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Pesan Sekarang", "url": "/pesan.html", "description": "Buka halaman pemesanan" },
+    { "name": "Admin Panel", "url": "/admin.html", "description": "Buka panel admin" }
+  ],
+  "categories": ["food", "business"]
+}
