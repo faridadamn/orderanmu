@@ -10,6 +10,7 @@
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+/* (semua style sama seperti sebelumnya - tidak perlu diubah) */
 :root {
   --c-dark: #1a1208; --c-gold: #c8922a; --c-gold-l: #e8b84b;
   --c-cream: #f5efe6; --c-white: #fdfaf5; --c-muted: #7a6352;
@@ -680,10 +681,12 @@ async function doCheckout() {
   document.getElementById('spinner').classList.add('show');
   document.getElementById('checkout-btn').disabled = true;
 
-// Buat ID unik dengan timestamp + random + counter
-const timestamp = Date.now();
-const random = Math.floor(Math.random() * 10000);
-let orderId = `ORD-${timestamp}-${random}`;
+  // ====== Buat ID UNIK ======
+  let queueNum = Math.floor(Math.random() * 50) + 1;
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 10000);
+  let orderId = `ORD-${timestamp}-${random}`;
+  // ==========================
 
   try {
     const res = await fetch(SCRIPT_URL, {
@@ -691,8 +694,13 @@ let orderId = `ORD-${timestamp}-${random}`;
       body: JSON.stringify({ action: 'createOrder', nama, hp, type, note, items, sub, tax, total })
     });
     const data = await res.json();
-    if (data.success) { queueNum = data.queueNum; orderId = data.orderId; }
-  } catch(e) {}
+    if (data.success) { 
+      queueNum = data.queueNum; 
+      orderId = data.orderId; 
+    }
+  } catch(e) {
+    console.log('Error saving to server:', e);
+  }
 
   document.getElementById('spinner').classList.remove('show');
 
@@ -733,25 +741,26 @@ let orderId = `ORD-${timestamp}-${random}`;
   setPage('queue');
 }
 
+// ====== INIT ======
 loadMenu();
 
-// Demo: Tambah data contoh untuk testing (hapus nanti)
+// Tambah sample order hanya jika belum ada
 setTimeout(() => {
   const existingOrders = getRecentOrders();
   if (existingOrders.length === 0) {
     const sampleOrder = {
-      orderId: 'ORD-20260414-001',
+      orderId: 'ORD-DEMO-001',
       queue: 1,
-      nama: 'Romeo',
+      nama: 'Demo User',
       hp: '081234567890',
       type: 'dine',
-      items: [{id:'1',name:'Nasi Goreng Spesial',emoji:'🍳',price:18000,qty:2}],
-      sub: 36000,
-      tax: 3960,
-      total: 39960,
+      items: [{id:'1',name:'Nasi Goreng Spesial',emoji:'🍳',price:18000,qty:1}],
+      sub: 18000,
+      tax: 1980,
+      total: 19980,
       status: 'pending',
-      time: '14:30',
-      date: '14/04/2025'
+      time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}),
+      date: new Date().toLocaleDateString('id-ID')
     };
     saveRecentOrder(sampleOrder);
     console.log('Sample order added for testing');
