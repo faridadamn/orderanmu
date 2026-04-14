@@ -106,7 +106,7 @@ function renderDashboard() {
   document.getElementById('dash-alert').innerHTML = alertHtml;
 }
 
-// ====== ORDERS ======
+// ====== ORDERS - Menggunakan Event Delegation ======
 function filterOrders(f, btn) {
   currentOrderFilter = f;
   document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
@@ -146,76 +146,67 @@ function renderOrders() {
             </span>
           </div>
         </div>
-        <div class="order-actions" id="actions-${o.id}">
+        <div class="order-actions">
           ${o.status==='pending' ? `<button class="btn-process" data-id="${o.id}" data-action="process">✅ Proses</button><button class="btn-cancel-order" data-id="${o.id}" data-action="cancel">✕ Batalkan</button>` : ''}
           ${o.status==='processing' ? `<button class="btn-done" data-id="${o.id}" data-action="done">✓ Selesai</button>` : ''}
-          ${o.status==='done' ? `<button class="btn-process" style="background:var(--c-cream);color:var(--c-text)" data-id="${o.id}" data-action="invoice">📄 Invoice</button>` : ''}
+          ${o.status==='done' ? `<button class="btn-invoice" data-id="${o.id}" data-action="invoice">📄 Invoice</button>` : ''}
         </div>
       </div>
     `;
   }
   
   document.getElementById('order-list').innerHTML = html;
-  
-  // Attach event listeners ke tombol-tombol yang baru dibuat
-  attachOrderButtonListeners();
 }
 
-// ATTACH EVENT LISTENERS ke tombol dinamis
-function attachOrderButtonListeners() {
-  // Tombol Proses (pending -> processing)
-  document.querySelectorAll('.btn-process').forEach(btn => {
-    btn.removeEventListener('click', handleProcessClick);
-    btn.addEventListener('click', handleProcessClick);
-  });
+// EVENT DELEGATION - Satu listener untuk semua tombol
+document.addEventListener('click', function(e) {
+  // Tombol Proses
+  if (e.target.classList && e.target.classList.contains('btn-process')) {
+    const orderId = e.target.getAttribute('data-id');
+    if (orderId) {
+      console.log('Process button clicked for:', orderId);
+      processOrder(orderId);
+    }
+    return;
+  }
   
-  // Tombol Selesai (processing -> done)
-  document.querySelectorAll('.btn-done').forEach(btn => {
-    btn.removeEventListener('click', handleDoneClick);
-    btn.addEventListener('click', handleDoneClick);
-  });
+  // Tombol Selesai
+  if (e.target.classList && e.target.classList.contains('btn-done')) {
+    const orderId = e.target.getAttribute('data-id');
+    if (orderId) {
+      console.log('Done button clicked for:', orderId);
+      doneOrder(orderId);
+    }
+    return;
+  }
   
   // Tombol Batalkan
-  document.querySelectorAll('.btn-cancel-order').forEach(btn => {
-    btn.removeEventListener('click', handleCancelClick);
-    btn.addEventListener('click', handleCancelClick);
-  });
-}
-
-// Handler untuk tombol Proses
-function handleProcessClick(e) {
-  e.stopPropagation();
-  const btn = e.currentTarget;
-  const orderId = btn.getAttribute('data-id');
-  if (orderId) {
-    processOrder(orderId);
+  if (e.target.classList && e.target.classList.contains('btn-cancel-order')) {
+    const orderId = e.target.getAttribute('data-id');
+    if (orderId) {
+      console.log('Cancel button clicked for:', orderId);
+      cancelOrder(orderId);
+    }
+    return;
   }
-}
-
-// Handler untuk tombol Selesai
-function handleDoneClick(e) {
-  e.stopPropagation();
-  const btn = e.currentTarget;
-  const orderId = btn.getAttribute('data-id');
-  if (orderId) {
-    doneOrder(orderId);
+  
+  // Tombol Invoice
+  if (e.target.classList && e.target.classList.contains('btn-invoice')) {
+    const orderId = e.target.getAttribute('data-id');
+    if (orderId) {
+      showInvoice(orderId);
+    }
+    return;
   }
-}
-
-// Handler untuk tombol Batalkan
-function handleCancelClick(e) {
-  e.stopPropagation();
-  const btn = e.currentTarget;
-  const orderId = btn.getAttribute('data-id');
-  if (orderId) {
-    cancelOrder(orderId);
-  }
-}
+});
 
 // ====== ORDER ACTIONS ======
 function processOrder(orderId) {
   console.log('Processing order:', orderId);
+  console.log('Current orders:', orders);
+  
   const orderIndex = orders.findIndex(x => x.id === orderId);
+  console.log('Order index:', orderIndex);
   
   if (orderIndex !== -1 && orders[orderIndex].status === 'pending') {
     orders[orderIndex].status = 'processing';
