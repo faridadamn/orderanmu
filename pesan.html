@@ -680,12 +680,10 @@ async function doCheckout() {
   document.getElementById('spinner').classList.add('show');
   document.getElementById('checkout-btn').disabled = true;
 
-  let queueNum = Math.floor(Math.random() * 50) + 1;
- // Buat ID unik: ORD-20260414-143052-1234 (tanggal + jam + random)
-const now = new Date();
-const dateStr = now.toISOString().slice(0,19).replace(/[-:T]/g, '');
-const randomNum = Math.floor(Math.random() * 10000);
-let orderId = `ORD-${dateStr}-${randomNum}`;
+// Buat ID unik dengan timestamp + random + counter
+const timestamp = Date.now();
+const random = Math.floor(Math.random() * 10000);
+let orderId = `ORD-${timestamp}-${random}`;
 
   try {
     const res = await fetch(SCRIPT_URL, {
