@@ -7,9 +7,9 @@ const fmt = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
 
 // Sample data dengan ID yang unik dan konsisten
 let orders = [
-  {id:'ORD-001',queue:1,nama:'jeremi teti',hp:'89890991234',type:'takeaway',note:'hmmm',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1},{name:'Ayam Bakar Madu',emoji:'🍗',price:25000,qty:1}],sub:63000,tax:6930,total:69930,status:'pending',time:'08:24',date:'14/04/2025'},
-  {id:'ORD-002',queue:2,nama:'romeo',hp:'81234567890',type:'takeaway',note:'pedes bwang',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1}],sub:38000,tax:4180,total:42180,status:'pending',time:'08:31',date:'14/04/2025'},
-  {id:'ORD-003',queue:3,nama:'Yayat',hp:'6281212686654',type:'takeaway',note:'Bawang semua',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1},{name:'Ayam Bakar Madu',emoji:'🍗',price:25000,qty:1}],sub:48000,tax:5280,total:53280,status:'pending',time:'08:15',date:'14/04/2025'},
+  {id:'ORD-20260414-001',queue:1,nama:'jeremi teti',hp:'89890991234',type:'takeaway',note:'hmmm',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1},{name:'Ayam Bakar Madu',emoji:'🍗',price:25000,qty:1}],sub:63000,tax:6930,total:69930,status:'pending',time:'08:24',date:'14/04/2025'},
+  {id:'ORD-20260414-002',queue:2,nama:'romeo',hp:'81234567890',type:'takeaway',note:'pedes bwang',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1}],sub:38000,tax:4180,total:42180,status:'pending',time:'08:31',date:'14/04/2025'},
+  {id:'ORD-20260414-003',queue:3,nama:'Yayat',hp:'6281212686654',type:'takeaway',note:'Bawang semua',items:[{name:'Nasi Padang',emoji:'🍚',price:15000,qty:2},{name:'Kuli Jawa',emoji:'🥤',price:8000,qty:1},{name:'Ayam Bakar Madu',emoji:'🍗',price:25000,qty:1}],sub:48000,tax:5280,total:53280,status:'pending',time:'08:15',date:'14/04/2025'},
 ];
 
 let menuItems = [
