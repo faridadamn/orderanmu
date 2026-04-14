@@ -2,7 +2,7 @@
   "name": "Warung Makan Sejahtera",
   "short_name": "Warung Sejahtera",
   "description": "Sistem pemesanan digital untuk warung makan",
-  "start_url": "/index.html",
+  "start_url": "/orderanmu",
   "display": "standalone",
   "background_color": "#1a1208",
   "theme_color": "#1a1208",
