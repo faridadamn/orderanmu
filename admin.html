@@ -374,7 +374,7 @@ function doLogin() {
 function init() {
   document.getElementById('tb-date').textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   loadConfig();
-  if (!SCRIPT_URL || SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
+  if (!SCRIPT_URL || SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxmIgqUCx5q-sMKX3-kPm6FVTsrg-AqLlbbTD6zY5kpDUciIH-T5FmqS5bkVmdwgfNtMQ/exec') {
     setConnStatus('err','Belum dikonfigurasi');
     showSec('config', document.querySelector('.ni:last-of-type'));
     toast('⚠️ Silakan masukkan URL Apps Script di tab Konfigurasi');
