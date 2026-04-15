@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1208">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Pesan — Warung Sejahtera</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--dark:#1a1208;--gold:#c8922a;--gold-l:#e8b84b;--cream:#f5efe6;--white:#fdfaf5;--muted:#7a6352;--text:#2d1f10;--border:rgba(0,0,0,0.08);--fd:'Playfair Display',serif;--fb:'DM Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;font-family:var(--fb);background:var(--cream);color:var(--text)}
+.topbar{background:var(--dark);padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50}
+.btn-back{background:rgba(255,255,255,0.1);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topbar-info{flex:1;min-width:0}
+.topbar-info h1{font-size:15px;font-weight:500;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar-info p{font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px}
+.btn-lacak{background:rgba(255,255,255,0.1);border:none;color:rgba(255,255,255,0.75);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;font-family:var(--fb);flex-shrink:0}
+.btn-cart{position:relative;background:var(--gold);border:none;color:var(--dark);width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cbadge{position:absolute;top:-4px;right:-4px;background:#e24b4a;color:white;width:17px;height:17px;border-radius:50%;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center}
+.page{display:none}
+.page.active{display:block}
+
+/* MENU */
+.sbar{padding:10px 14px;background:var(--white);border-bottom:1px solid var(--border)}
+.sbar input{width:100%;padding:9px 13px 9px 36px;border-radius:10px;border:1px solid var(--border);background:var(--cream);font-size:14px;font-family:var(--fb);color:var(--text);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a6352' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center;background-size:16px}
+.sbar input:focus{border-color:var(--gold);outline:none}
+.cbar{display:flex;gap:7px;padding:9px 14px;overflow-x:auto;scrollbar-width:none;background:var(--white);border-bottom:1px solid var(--border)}
+.cbar::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:5px 14px;border-radius:100px;border:1px solid var(--border);background:transparent;font-size:13px;color:var(--muted);cursor:pointer;font-family:var(--fb)}
+.chip.on{background:var(--dark);color:white;border-color:var(--dark)}
+.mlist{padding:11px 14px;display:flex;flex-direction:column;gap:9px;padding-bottom:88px}
+.icard{background:var(--white);border-radius:13px;border:1px solid var(--border);display:flex;align-items:center;gap:11px;padding:11px 13px}
+.icard.oos{opacity:.5;pointer-events:none}
+.iemoji{font-size:38px;flex-shrink:0;width:50px;text-align:center}
+.iinfo{flex:1;min-width:0}
+.iname{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px}
+.idesc{font-size:12px;color:var(--muted);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iprice{font-family:var(--fd);font-size:15px;color:var(--gold)}
+.iact{flex-shrink:0}
+.badd{width:32px;height:32px;border-radius:50%;background:var(--dark);color:white;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.badd:active{background:var(--gold)}
+.qctrl{display:flex;align-items:center;gap:6px}
+.qbtn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--dark);background:transparent;color:var(--dark);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--fb)}
+.qbtn.p{background:var(--dark);color:white;border-color:var(--dark)}
+.qbtn:active{opacity:.65}
+.qn{font-size:14px;font-weight:500;min-width:18px;text-align:center}
+.oosbadge{font-size:11px;background:#FCEBEB;color:#791F1F;padding:3px 9px;border-radius:100px}
+
+/* FLOATING BAR */
+.fbar{position:fixed;bottom:0;left:0;right:0;z-index:40;background:var(--dark);color:white;padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));display:none;align-items:center;justify-content:space-between;cursor:pointer}
+.fbar.on{display:flex}
+.fbar-l{display:flex;align-items:center;gap:10px}
+.fbar-n{background:var(--gold);color:var(--dark);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+.fbar-t{font-size:14px;font-weight:500}
+.fbar-r{font-size:14px;font-weight:500;color:var(--gold)}
+
+/* CART */
+.chdr{padding:15px 14px 9px}
+.chdr h2{font-family:var(--fd);font-size:22px;color:var(--text);margin-bottom:3px}
+.chdr p{font-size:13px;color:var(--muted)}
+.citems{padding:0 14px;display:flex;flex-direction:column;gap:8px}
+.ci{background:var(--white);border-radius:12px;border:1px solid var(--border);padding:11px 13px;display:flex;align-items:center;gap:10px}
+.ciemj{font-size:26px;flex-shrink:0}
+.ciinfo{flex:1;min-width:0}
+.ciname{font-size:14px;font-weight:500;color:var(--text)}
+.cisub{font-size:12px;color:var(--muted);margin-top:2px}
+.fwrap{padding:13px 14px}
+.fwrap h3{font-size:15px;font-weight:500;color:var(--text);margin-bottom:12px}
+.ff{margin-bottom:11px}
+.ff label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500}
+.ff input,.ff select,.ff textarea{width:100%;padding:10px 13px;border-radius:10px;border:1px solid var(--border);font-size:14px;font-family:var(--fb);background:var(--white);color:var(--text);transition:border-color .15s}
+.ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--gold);outline:none}
+.ff textarea{resize:none;height:64px}
+.sumbox{margin:0 14px 11px;background:var(--white);border-radius:12px;border:1px solid var(--border);padding:12px}
+.sr{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:3px 0}
+.sr.g{font-size:16px;font-weight:500;color:var(--text);border-top:1px solid var(--border);margin-top:7px;padding-top:8px}
+.obtn{display:block;margin:0 14px;padding:15px;background:var(--gold);color:var(--dark);border:none;border-radius:13px;font-size:15px;font-weight:500;font-family:var(--fb);cursor:pointer;width:calc(100% - 28px);transition:background .2s;margin-bottom:max(22px,env(safe-area-inset-bottom,22px))}
+.obtn:active{background:var(--gold-l)}
+.obtn:disabled{opacity:.5;cursor:not-allowed}
+
+/* QUEUE */
+.qpg{min-height:100vh;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;text-align:center}
+.qico{font-size:58px;margin-bottom:18px}
+.qlbl{font-size:13px;color:rgba(255,255,255,0.4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.qnum{font-family:var(--fd);font-size:84px;color:var(--gold);font-weight:700;line-height:1;margin-bottom:5px}
+.qname{font-size:18px;color:white;font-weight:500;margin-bottom:3px}
+.qsub{font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:26px}
+.qscard{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:13px;padding:16px 20px;width:100%;max-width:290px;margin-bottom:18px}
+.qsrow{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.qsrow:last-child{margin-bottom:0}
+.qdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dd{background:#1D9E75}.da{background:var(--gold);animation:bl 1.5s infinite}.dw{background:rgba(255,255,255,0.18)}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+.qstxt{font-size:13px;color:rgba(255,255,255,0.65);text-align:left}
+.qibox{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:13px;width:100%;max-width:290px;margin-bottom:18px}
+.qirow{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;color:rgba(255,255,255,0.55)}
+.qitot{display:flex;justify-content:space-between;font-size:14px;padding:8px 0 0;margin-top:5px;border-top:1px solid rgba(255,255,255,0.1);color:white;font-weight:500}
+.qnote{font-size:12px;color:rgba(255,255,255,0.28);max-width:260px;line-height:1.6;margin-bottom:20px}
+.qacts{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.bqt{padding:10px 20px;background:var(--gold);color:var(--dark);border:none;border-radius:100px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--fb)}
+.bqh{padding:10px 20px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);border-radius:100px;font-size:13px;cursor:pointer;font-family:var(--fb)}
+
+/* TRACK */
+.tpg{padding:13px 14px max(80px,calc(env(safe-area-inset-bottom)+20px))}
+.thero{text-align:center;padding:18px 0 14px}
+.thero h2{font-family:var(--fd);font-size:22px;color:var(--text);margin-bottom:4px}
+.thero p{font-size:13px;color:var(--muted)}
+.tfbox{background:var(--white);border-radius:12px;border:1px solid var(--border);padding:13px;margin-bottom:13px}
+.tfbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.trow{display:flex;gap:8px}
+.trow input{flex:1;padding:10px 13px;border-radius:10px;border:1px solid var(--border);font-size:14px;font-family:var(--fb);color:var(--text)}
+.trow input:focus{border-color:var(--gold);outline:none}
+.bcari{padding:10px 16px;background:var(--dark);color:white;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--fb);white-space:nowrap}
+.bcari:active{background:var(--gold);color:var(--dark)}
+.tresults{margin-top:4px}
+/* Track card */
+.tkcard{background:var(--white);border-radius:13px;border:1px solid var(--border);overflow:hidden;margin-bottom:11px}
+.tkhead{background:var(--dark);padding:13px 15px;display:flex;justify-content:space-between;align-items:center}
+.tknum{font-family:var(--fd);font-size:42px;color:var(--gold);font-weight:700;line-height:1}
+.tkmeta{text-align:right}
+.tkoid{font-size:11px;color:rgba(255,255,255,0.38)}
+.tkname{font-size:14px;color:white;font-weight:500;margin-top:2px}
+.tktype{font-size:12px;color:rgba(255,255,255,0.4);margin-top:1px}
+.tkbody{padding:13px}
+.stepper{display:flex;flex-direction:column;margin-bottom:12px}
+.steprow{display:flex;gap:11px;align-items:flex-start}
+.stepcol{display:flex;flex-direction:column;align-items:center;width:20px}
+.sdot{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white}
+.sdd{background:#1D9E75}.sda{background:var(--gold);color:var(--dark);animation:pd 1.5s infinite}.sdw{background:rgba(0,0,0,0.1);color:var(--muted)}
+@keyframes pd{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.sline{width:2px;flex:1;min-height:16px;background:var(--border)}
+.sline.sl{background:#1D9E75}
+.stxt{padding-bottom:18px}
+.stitle{font-size:14px;font-weight:500;color:var(--text)}
+.stitle.mt{color:var(--muted)}
+.ssub{font-size:12px;color:var(--muted);margin-top:2px}
+.ssub.ac{color:var(--gold);font-weight:500}
+.tkitems{border-top:1px solid var(--border);padding-top:10px}
+.tkitlbl{font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.tkitr{display:flex;justify-content:space-between;font-size:13px;color:var(--text);padding:3px 0}
+.tktot{display:flex;justify-content:space-between;font-size:14px;font-weight:500;color:var(--text);padding-top:7px;margin-top:4px;border-top:1px solid var(--border)}
+.tempty{text-align:center;padding:28px 0;color:var(--muted);font-size:14px}
+.temptyico{font-size:36px;margin-bottom:9px}
+.trecent{margin-top:13px}
+.trtitle{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.tritem{background:var(--white);border-radius:11px;border:1px solid var(--border);padding:10px 13px;display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;cursor:pointer}
+.tritem:active{background:var(--cream)}
+.troid{font-size:11px;color:var(--muted)}
+.trname{font-size:14px;font-weight:500;margin-top:2px;color:var(--text)}
+.trbadge{font-size:11px;padding:3px 9px;border-radius:100px;white-space:nowrap;flex-shrink:0}
+.bpend{background:#FAEEDA;color:#633806}.bproc{background:#E6F1FB;color:#185FA5}.bdone{background:#E1F5EE;color:#085041}
+
+/* SPINNER + TOAST */
+.spov{position:fixed;inset:0;background:rgba(26,18,8,0.72);z-index:999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:13px}
+.spov.on{display:flex}
+.sp{width:36px;height:36px;border:3px solid rgba(200,146,42,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sptxt{color:rgba(255,255,255,0.6);font-size:13px}
+.toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--dark);color:white;padding:10px 18px;border-radius:100px;font-size:13px;opacity:0;transition:all .25s;z-index:300;white-space:nowrap;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="spov" id="sp"><div class="sp"></div><div class="sptxt">Memproses pesanan...</div></div>
+<div class="toast" id="toast"></div>
+
+<div class="topbar">
+  <button class="btn-back" onclick="goBack()">←</button>
+  <div class="topbar-info">
+    <h1 id="ptitle">Menu</h1>
+    <p>Warung Makan Sejahtera</p>
+  </div>
+  <button class="btn-lacak" id="btnlacak" onclick="showLacak()">Lacak</button>
+  <button class="btn-cart" id="btncart" onclick="showCart()">🛒<span class="cbadge" id="cbadge"></span></button>
+</div>
+
+<!-- MENU -->
+<div class="page active" id="pg-menu">
+  <div class="sbar"><input type="text" id="sinput" placeholder="Cari menu..." oninput="doSearch(this.value)"></div>
+  <div class="cbar" id="catbar"></div>
+  <div class="mlist" id="mlist"></div>
+</div>
+
+<!-- CART -->
+<div class="page" id="pg-cart">
+  <div class="chdr"><h2>Keranjang</h2><p id="ctxt">0 item</p></div>
+  <div class="citems" id="citems"></div>
+  <div class="fwrap">
+    <h3>Data Pemesan</h3>
+    <div class="ff"><label>Nama lengkap *</label><input type="text" id="inama" placeholder="contoh: Budi Santoso" autocomplete="name"></div>
+    <div class="ff"><label>Nomor HP / WhatsApp *</label><input type="tel" id="ihp" placeholder="contoh: 08123456789" autocomplete="tel"></div>
+    <div class="ff"><label>Tipe pesanan *</label>
+      <select id="itype">
+        <option value="dine">Makan di tempat</option>
+        <option value="takeaway">Bawa pulang</option>
+      </select>
+    </div>
+    <div class="ff"><label>Catatan (opsional)</label><textarea id="inote" placeholder="contoh: tanpa bawang, extra pedas..."></textarea></div>
+  </div>
+  <div class="sumbox">
+    <div class="sr"><span>Subtotal</span><span id="ssub">Rp 0</span></div>
+    <div class="sr"><span>PPN 11%</span><span id="stax">Rp 0</span></div>
+    <div class="sr g"><span>Total</span><span id="stot">Rp 0</span></div>
+  </div>
+  <button class="obtn" id="obtn" onclick="doCheckout()">Konfirmasi Pesanan →</button>
+</div>
+
+<!-- QUEUE -->
+<div class="page" id="pg-queue"><div class="qpg" id="qcontent"></div></div>
+
+<!-- TRACK -->
+<div class="page" id="pg-track">
+  <div class="tpg">
+    <div class="thero"><h2>Lacak Pesanan</h2><p>Masukkan nomor HP yang digunakan saat memesan</p></div>
+    <div class="tfbox">
+      <label>Nomor HP / WhatsApp</label>
+      <div class="trow">
+        <input type="tel" id="thp" placeholder="contoh: 08123456789" onkeydown="if(event.key==='Enter')doTrack()">
+        <button class="bcari" onclick="doTrack()">Cari</button>
+      </div>
+    </div>
+    <div id="tresults" class="tresults"></div>
+    <div id="trecent" class="trecent" style="display:none">
+      <div class="trtitle">Pesanan terakhir di perangkat ini</div>
+      <div id="trecentlist"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FLOATING BAR -->
+<div class="fbar" id="fbar" onclick="showCart()">
+  <div class="fbar-l"><div class="fbar-n" id="fbar-n">0</div><div class="fbar-t" id="fbar-t">Lihat Keranjang</div></div>
+  <div class="fbar-r" id="fbar-r">Rp 0</div>
+</div>
+
+<script>
+// ── CONFIG ── ganti setelah deploy Apps Script ──────────────
+const SCRIPT_URL = localStorage.getItem('kpos_url') || 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+// ────────────────────────────────────────────────────────────
+
+const cart = {};
+let menu = [];
+let cat = 'semua';
+let sq = '';
+const fmt = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+
+// ── LOAD MENU ────────────────────────────────────────────────
+async function loadMenu() {
+  try {
+    const r = await fetch(SCRIPT_URL + '?action=getMenu');
+    const d = await r.json();
+    if (d.menu && d.menu.length) { menu = d.menu; }
+    else { fallbackMenu(); }
+  } catch(e) { fallbackMenu(); }
+  renderCats();
+  renderMenu();
+}
+
+function fallbackMenu() {
+  menu = [
+    {id:'1',name:'Nasi Goreng Spesial',price:18000,emoji:'🍳',cat:'makanan',desc:'Nasi goreng bumbu rahasia dengan telur',stock:24},
+    {id:'2',name:'Mie Ayam Bakso',price:15000,emoji:'🍜',cat:'makanan',desc:'Mie kenyal dengan ayam dan bakso',stock:12},
+    {id:'3',name:'Ayam Bakar Madu',price:25000,emoji:'🍗',cat:'makanan',desc:'Ayam bakar dengan saus madu',stock:5},
+    {id:'4',name:'Soto Ayam',price:14000,emoji:'🥣',cat:'makanan',desc:'Kuah bening segar dengan irisan ayam',stock:8},
+    {id:'5',name:'Es Teh Manis',price:5000,emoji:'🧊',cat:'minuman',desc:'Teh segar dengan es batu',stock:50},
+    {id:'6',name:'Jus Jeruk Segar',price:10000,emoji:'🍊',cat:'minuman',desc:'Jeruk peras segar tanpa pengawet',stock:30},
+    {id:'7',name:'Es Cincau Hijau',price:8000,emoji:'🍵',cat:'minuman',desc:'Cincau hijau alami dengan santan',stock:20},
+    {id:'8',name:'Kerupuk Udang',price:3000,emoji:'🥨',cat:'snack',desc:'Kerupuk renyah sebagai pelengkap',stock:99},
+  ];
+}
+
+function renderCats() {
+  const cats = ['semua', ...new Set(menu.map(m => m.cat))];
+  document.getElementById('catbar').innerHTML = cats.map(c =>
+    `<button class="chip${c===cat?' on':''}" onclick="setCat('${c}',this)">${c.charAt(0).toUpperCase()+c.slice(1)}</button>`
+  ).join('');
+}
+
+function setCat(c, btn) {
+  cat = c;
+  document.querySelectorAll('.chip').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderMenu();
+}
+
+function doSearch(q) { sq = q.toLowerCase(); renderMenu(); }
+
+function renderMenu() {
+  let items = cat === 'semua' ? [...menu] : menu.filter(m => m.cat === cat);
+  if (sq) items = items.filter(m => m.name.toLowerCase().includes(sq) || m.desc.toLowerCase().includes(sq));
+  if (!items.length) {
+    document.getElementById('mlist').innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:14px">Menu tidak ditemukan</div>';
+    return;
+  }
+  document.getElementById('mlist').innerHTML = items.map(m => {
+    const qty = cart[m.id] || 0;
+    const oos = m.stock <= 0;
+    const act = oos
+      ? '<span class="oosbadge">Habis</span>'
+      : qty === 0
+        ? `<button class="badd" onclick="addItem('${m.id}')">+</button>`
+        : `<div class="qctrl"><button class="qbtn" onclick="chQty('${m.id}',-1)">−</button><span class="qn">${qty}</span><button class="qbtn p" onclick="chQty('${m.id}',1)">+</button></div>`;
+    return `<div class="icard${oos?' oos':''}">
+      <div class="iemoji">${m.emoji}</div>
+      <div class="iinfo"><div class="iname">${m.name}</div><div class="idesc">${m.desc}</div><div class="iprice">${fmt(m.price)}</div></div>
+      <div class="iact">${act}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── CART ─────────────────────────────────────────────────────
+function addItem(id) { cart[id] = 1; refreshBar(); renderMenu(); }
+
+function chQty(id, d) {
+  cart[id] = (cart[id]||0) + d;
+  if (cart[id] <= 0) delete cart[id];
+  refreshBar();
+  renderMenu();
+  if (document.getElementById('pg-cart').classList.contains('active')) renderCartPage();
+}
+
+function getTotals() {
+  const ids = Object.keys(cart);
+  const qty = ids.reduce((a,id) => a + cart[id], 0);
+  const sub = ids.reduce((a,id) => { const m=menu.find(x=>x.id==id); return a+(m?m.price*cart[id]:0); }, 0);
+  const tax = Math.round(sub * 0.11);
+  return { ids, qty, sub, tax, total: sub+tax };
+}
+
+function refreshBar() {
+  const {qty, total} = getTotals();
+  const bar = document.getElementById('fbar');
+  const badge = document.getElementById('cbadge');
+  if (qty > 0) {
+    bar.classList.add('on');
+    document.getElementById('fbar-n').textContent = qty;
+    document.getElementById('fbar-t').textContent = qty + ' item dipilih';
+    document.getElementById('fbar-r').textContent = fmt(total);
+    badge.textContent = qty; badge.style.display = 'flex';
+  } else {
+    bar.classList.remove('on');
+    badge.style.display = 'none';
+  }
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────
+function setPage(pg) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('pg-'+pg).classList.add('active');
+  const onMenu = pg === 'menu';
+  document.getElementById('fbar').classList[onMenu ? (getTotals().qty > 0 ? 'add' : 'remove') : 'remove']('on');
+  if (onMenu) refreshBar();
+  const showTopBtns = onMenu;
+  document.getElementById('btncart').style.display = showTopBtns ? 'flex' : 'none';
+  document.getElementById('btnlacak').style.display = showTopBtns ? 'block' : 'none';
+  window.scrollTo(0,0);
+}
+
+function goBack() {
+  const active = document.querySelector('.page.active');
+  if (!active) return;
+  if (active.id === 'pg-cart' || active.id === 'pg-track') {
+    setPage('menu'); document.getElementById('ptitle').textContent = 'Menu';
+  } else {
+    location.href = 'index.html';
+  }
+}
+
+function showCart() {
+  const {qty} = getTotals();
+  if (qty === 0) { toast('Keranjang masih kosong'); return; }
+  setPage('cart');
+  document.getElementById('ptitle').textContent = 'Keranjang';
+  renderCartPage();
+}
+
+function renderCartPage() {
+  const {ids, qty, sub, tax, total} = getTotals();
+  document.getElementById('ctxt').textContent = qty + ' item';
+  if (ids.length === 0) { setPage('menu'); document.getElementById('ptitle').textContent = 'Menu'; return; }
+  document.getElementById('citems').innerHTML = ids.map(id => {
+    const m = menu.find(x => x.id==id); if (!m) return '';
+    const q = cart[id];
+    return `<div class="ci">
+      <div class="ciemj">${m.emoji}</div>
+      <div class="ciinfo"><div class="ciname">${m.name}</div><div class="cisub">${fmt(m.price)} × ${q} = ${fmt(m.price*q)}</div></div>
+      <div class="qctrl"><button class="qbtn" onclick="chQty('${id}',-1)">−</button><span class="qn">${q}</span><button class="qbtn p" onclick="chQty('${id}',1)">+</button></div>
+    </div>`;
+  }).join('');
+  document.getElementById('ssub').textContent = fmt(sub);
+  document.getElementById('stax').textContent = fmt(tax);
+  document.getElementById('stot').textContent = fmt(total);
+}
+
+function showLacak() {
+  setPage('track');
+  document.getElementById('ptitle').textContent = 'Lacak Pesanan';
+  showRecent();
+}
+
+// ── CHECKOUT ─────────────────────────────────────────────────
+async function doCheckout() {
+  const nama = document.getElementById('inama').value.trim();
+  const hp   = document.getElementById('ihp').value.trim();
+  const type = document.getElementById('itype').value;
+  const note = document.getElementById('inote').value.trim();
+  if (!nama) { toast('⚠️ Nama harus diisi'); return; }
+  if (!hp)   { toast('⚠️ Nomor HP harus diisi'); return; }
+  if (Object.keys(cart).length===0) { toast('⚠️ Keranjang kosong'); return; }
+
+  const {ids, sub, tax, total} = getTotals();
+  const items = ids.map(id => { const m=menu.find(x=>x.id==id); return {id:m.id,name:m.name,emoji:m.emoji,price:m.price,qty:cart[id]}; });
+
+  document.getElementById('sp').classList.add('on');
+  document.getElementById('obtn').disabled = true;
+
+  let queueNum = Math.floor(Math.random()*50)+1;
+  let orderId  = 'ORD-'+Date.now().toString().slice(-6);
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action:'createOrder',nama,hp,type,note,items,sub,tax,total})
+    });
+    const d = await res.json();
+    if (d.success) { queueNum=d.queueNum; orderId=d.orderId; }
+  } catch(e) { /* offline fallback */ }
+
+  document.getElementById('sp').classList.remove('on');
+  document.getElementById('obtn').disabled = false;
+
+  saveLocal({orderId,queue:queueNum,nama,hp,type,note,items,sub,tax,total,status:'pending',
+    time:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})});
+
+  Object.keys(cart).forEach(k => delete cart[k]);
+  refreshBar();
+  setPage('queue');
+  document.getElementById('ptitle').textContent = 'Antrian';
+
+  document.getElementById('qcontent').innerHTML = `
+    <div class="qico">🎉</div>
+    <div class="qlbl">Nomor antrian kamu</div>
+    <div class="qnum">${String(queueNum).padStart(2,'0')}</div>
+    <div class="qname">${nama}</div>
+    <div class="qsub">${type==='dine'?'Makan di tempat':'Bawa pulang'} · ${orderId}</div>
+    <div class="qscard">
+      <div class="qsrow"><div class="qdot dd"></div><div class="qstxt">✓ Pesanan diterima sistem</div></div>
+      <div class="qsrow"><div class="qdot da"></div><div class="qstxt">🍳 Menunggu konfirmasi dapur...</div></div>
+      <div class="qsrow"><div class="qdot dw"></div><div class="qstxt">📲 Invoice dikirim ke ${hp} setelah selesai</div></div>
+    </div>
+    <div class="qibox">
+      ${items.map(i=>`<div class="qirow"><span>${i.emoji} ${i.name} ×${i.qty}</span><span>${fmt(i.price*i.qty)}</span></div>`).join('')}
+      <div class="qitot"><span>Total</span><span>${fmt(total)}</span></div>
+    </div>
+    <div class="qnote">Tunjukkan nomor ini ke kasir. Invoice otomatis dikirim setelah pesanan selesai diproses.</div>
+    <div class="qacts">
+      <button class="bqt" onclick="goLacak('${hp}')">🔍 Lacak Pesanan</button>
+      <button class="bqh" onclick="location.href='index.html'">← Beranda</button>
+    </div>`;
+}
+
+function goLacak(hp) {
+  showLacak();
+  document.getElementById('thp').value = hp;
+  doTrack();
+}
+
+// ── TRACK ────────────────────────────────────────────────────
+function showRecent() {
+  const list = loadLocal();
+  const el = document.getElementById('trecent');
+  if (!list.length) { el.style.display='none'; return; }
+  el.style.display = 'block';
+  document.getElementById('trecentlist').innerHTML = list.map(o => {
+    const bc = o.status==='done'?'bdone':o.status==='processing'?'bproc':'bpend';
+    const bt = o.status==='done'?'Selesai':o.status==='processing'?'Diproses':'Menunggu';
+    return `<div class="tritem" onclick='showOneTrack(${JSON.stringify(o)})'>
+      <div><div class="troid">${o.orderId} · Antrian #${o.queue}</div><div class="trname">${o.nama}</div></div>
+      <span class="trbadge ${bc}">${bt}</span>
+    </div>`;
+  }).join('');
+}
+
+async function doTrack() {
+  const hp = document.getElementById('thp').value.trim();
+  if (!hp) { toast('⚠️ Masukkan nomor HP'); return; }
+  document.getElementById('tresults').innerHTML = '<div class="tempty"><div class="temptyico">🔍</div>Mencari pesanan...</div>';
+  let orders = [];
+  try {
+    const res = await fetch(SCRIPT_URL+'?action=trackOrder&hp='+encodeURIComponent(hp));
+    const d = await res.json();
+    orders = d.orders || [];
+  } catch(e) {
+    orders = loadLocal().filter(o => o.hp===hp);
+  }
+  if (!orders.length) {
+    document.getElementById('tresults').innerHTML = `<div class="tempty"><div class="temptyico">🤷</div>Tidak ada pesanan untuk <strong>${hp}</strong><br><span style="font-size:12px;display:block;margin-top:5px">Pastikan nomor sama dengan saat memesan</span></div>`;
+    return;
+  }
+  document.getElementById('tresults').innerHTML = orders.slice(0,5).map(o => buildTkCard(o)).join('');
+  document.getElementById('trecent').style.display = 'none';
+}
+
+function showOneTrack(o) {
+  document.getElementById('tresults').innerHTML = buildTkCard(o);
+  document.getElementById('trecent').style.display = 'none';
+  document.getElementById('thp').value = o.hp || '';
+  window.scrollTo(0,0);
+}
+
+function buildTkCard(o) {
+  const steps = [
+    {title:'Pesanan diterima', sub:'Menunggu konfirmasi dapur'},
+    {title:'Sedang dimasak',   sub:'Pesanan sedang disiapkan'},
+    {title:'Pesanan selesai',  sub:'Silakan ambil pesananmu'},
+  ];
+  const ord = ['pending','processing','done'];
+  const cur = ord.indexOf(o.status);
+  const stHtml = steps.map((s,i) => {
+    const done=i<cur, active=i===cur;
+    const dc = done?'sdd':active?'sda':'sdw';
+    const di = done?'✓':String(i+1);
+    return `<div class="steprow">
+      <div class="stepcol">
+        <div class="sdot ${dc}">${di}</div>
+        ${i<steps.length-1?`<div class="sline${done?' sl':''}"></div>`:''}
+      </div>
+      <div class="stxt">
+        <div class="stitle${!done&&!active?' mt':''}">${s.title}</div>
+        <div class="ssub${active?' ac':''}">${s.sub}</div>
+      </div>
+    </div>`;
+  }).join('');
+  const itHtml = (o.items||[]).map(i =>
+    `<div class="tkitr"><span>${i.emoji||''} ${i.name} ×${i.qty}</span><span>${fmt(i.price*i.qty)}</span></div>`
+  ).join('');
+  return `<div class="tkcard">
+    <div class="tkhead">
+      <div class="tknum">${String(o.queue).padStart(2,'0')}</div>
+      <div class="tkmeta"><div class="tkoid">${o.orderId||''}</div><div class="tkname">${o.nama}</div><div class="tktype">${o.type==='dine'?'Makan di tempat':'Bawa pulang'}</div></div>
+    </div>
+    <div class="tkbody">
+      <div class="stepper">${stHtml}</div>
+      ${itHtml?`<div class="tkitems"><div class="tkitlbl">Rincian pesanan</div>${itHtml}<div class="tktot"><span>Total</span><span>${fmt(o.total)}</span></div></div>`:''}
+    </div>
+  </div>`;
+}
+
+// ── LOCAL STORAGE ────────────────────────────────────────────
+function loadLocal() { try { return JSON.parse(localStorage.getItem('kpos_orders')||'[]'); } catch(e){return[];} }
+function saveLocal(o) {
+  try {
+    let l = loadLocal().filter(x=>x.orderId!==o.orderId);
+    l.unshift(o); localStorage.setItem('kpos_orders', JSON.stringify(l.slice(0,10)));
+  } catch(e){}
+}
+
+// ── TOAST ────────────────────────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('on');
+  setTimeout(()=>el.classList.remove('on'), 2600);
+}
+
+loadMenu();
+</script>
+</body>
+</html>
